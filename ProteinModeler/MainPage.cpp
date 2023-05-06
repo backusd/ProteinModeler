@@ -138,6 +138,21 @@ namespace winrt::ProteinModeler::implementation
     }
 
 
+    // Viewport
+    void MainPage::ViewportGrid_SizeChanged(IInspectable const& sender, SizeChangedEventArgs const& e)
+    {
+        concurrency::critical_section::scoped_lock lock(m_main->GetCriticalSection());
+
+        auto viewportGrid = sender.as<Controls::Grid>();
+        
+        float top = viewportGrid.ActualOffset().y;
+        float left = viewportGrid.ActualOffset().x;
+
+        float height = e.NewSize().Height;
+        float width = e.NewSize().Width;
+
+        m_main->SetViewport(top, left, height, width);
+    }
 
 
 
@@ -156,6 +171,9 @@ namespace winrt::ProteinModeler::implementation
         myButton().Content(box_value(L"Clicked"));
     }
 }
+
+
+
 
 
 

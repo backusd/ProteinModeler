@@ -20,6 +20,9 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -28,6 +31,36 @@
     <ClInclude Include="ModelerMain.h" />
     <ClInclude Include="ModelerUIControl.h" />
     <ClInclude Include="Renderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="InputLayout.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="RasterizerState.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="BlendState.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthStencilState.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBufferArray.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineConfig.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshSet.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderObjectList.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
       <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
@@ -64,6 +97,9 @@
     <Filter Include="Rendering">
       <UniqueIdentifier>{669390b2-8317-45e4-9edd-c715d93b2733}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Shaders">
+      <UniqueIdentifier>{ce985f00-38c7-4a55-8276-6bf542c056ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="PropertySheet.props" />
@@ -71,5 +107,13 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="BoxVertexShader.hlsl">
+      <Filter>Rendering\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="BoxPixelShader.hlsl">
+      <Filter>Rendering\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

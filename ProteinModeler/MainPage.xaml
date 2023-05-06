@@ -5,13 +5,62 @@
     xmlns:local="using:ProteinModeler"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d">
 
     <SwapChainPanel x:Name="DXSwapChainPanel" 
                     SizeChanged="DXSwapChainPanel_SizeChanged"
                     CompositionScaleChanged="DXSwapChainPanel_CompositionScaleChanged">
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button x:Name="myButton" Click="ClickHandler">Click Me</Button>
-        </StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <muxc:MenuBar>
+            <muxc:MenuBarItem Title="File">
+                <MenuFlyoutSubItem Text="New">
+                    <MenuFlyoutItem Text="Plain Text Document"/>
+                    <MenuFlyoutItem Text="Rich Text Document"/>
+                    <MenuFlyoutItem Text="Other Formats..."/>
+                </MenuFlyoutSubItem>
+                <MenuFlyoutItem Text="Open..."/>
+                <MenuFlyoutItem Text="Save"/>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Exit"/>
+            </muxc:MenuBarItem>
+
+            <muxc:MenuBarItem Title="Edit">
+                <MenuFlyoutItem Text="Undo"/>
+                <MenuFlyoutItem Text="Cut"/>
+                <MenuFlyoutItem Text="Copy"/>
+                <MenuFlyoutItem Text="Paste"/>
+            </muxc:MenuBarItem>
+
+            <muxc:MenuBarItem Title="View">
+                <MenuFlyoutItem Text="Output"/>
+                <MenuFlyoutSeparator/>
+                <muxc:RadioMenuFlyoutItem Text="Landscape" GroupName="OrientationGroup"/>
+                <muxc:RadioMenuFlyoutItem Text="Portrait" GroupName="OrientationGroup" IsChecked="True"/>
+                <MenuFlyoutSeparator/>
+                <muxc:RadioMenuFlyoutItem Text="Small icons" GroupName="SizeGroup"/>
+                <muxc:RadioMenuFlyoutItem Text="Medium icons" IsChecked="True" GroupName="SizeGroup"/>
+                <muxc:RadioMenuFlyoutItem Text="Large icons" GroupName="SizeGroup"/>
+            </muxc:MenuBarItem>
+
+            <muxc:MenuBarItem Title="Help">
+                <MenuFlyoutItem Text="About"/>
+            </muxc:MenuBarItem>
+        </muxc:MenuBar>
+
+        <!-- This grid defines the region to region to assign the viewport.
+             We require the SwapChainPanel to encompass the entire app window so that render target back buffer
+             can be made the same size as the entire app. From there, we can assign a subregion of the app as the
+             viewport where the 3D scene will be rendered to. -->
+        <Grid x:Name="ViewportGrid" Grid.Row="1" SizeChanged="ViewportGrid_SizeChanged" />
+
+        <Button x:Name="myButton" Grid.Row="1" Click="ClickHandler">Click Me</Button>
     </SwapChainPanel>
 </Page>

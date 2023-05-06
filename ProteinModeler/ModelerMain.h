@@ -26,6 +26,9 @@ public:
     void OnDeviceLost() override {}
     void OnDeviceRestored() override {}
 
+    // Rendering Stuff
+    inline void SetViewport(float top, float left, float height, float width) const { m_renderer->SetViewport(top, left, height, width); }
+
 private:
     void UpdateLayoutState();
     void Update();
