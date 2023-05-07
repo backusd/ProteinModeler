@@ -101,9 +101,8 @@ void Renderer::CreateBoxPipelineConfig()
     std::unique_ptr<ConstantBufferArray> vsCBA = std::make_unique<ConstantBufferArray>(m_deviceResources);
 
     // Buffer #1: WorldViewProjection - Will be updated by Scene once per frame
-    std::shared_ptr<ConstantBuffer> vsWorldViewProjectionBuffer = std::make_shared<ConstantBuffer>(m_deviceResources);
-    vsWorldViewProjectionBuffer->CreateBuffer<WorldViewProjectionMatrix>(D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, 0u, 0u);
-    //vsWorldViewProjectionBuffer->CreateBuffer<WorldViewProjectionMatrix>(D3D11_USAGE_DEFAULT, 0, 0u, 0u);
+    std::shared_ptr<ConstantBuffer<WorldViewProjectionMatrix>> vsWorldViewProjectionBuffer = 
+        std::make_shared<ConstantBuffer<WorldViewProjectionMatrix>>(m_deviceResources, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, 0u, 0u);
 
     vsCBA->AddBuffer(vsWorldViewProjectionBuffer);
 

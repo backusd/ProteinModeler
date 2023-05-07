@@ -3,25 +3,22 @@
 #include "DeviceResources.h"
 
 
-class ConstantBuffer
+class ConstantBufferBase
 {
 public:
-	ConstantBuffer(std::shared_ptr<DeviceResources> deviceResources) noexcept :
+	ConstantBufferBase(std::shared_ptr<DeviceResources> deviceResources) noexcept :
 		m_deviceResources(deviceResources),
 		m_buffer(nullptr)
 	{
 		WINRT_ASSERT(m_deviceResources != nullptr);
 	}
-	ConstantBuffer(const ConstantBuffer&) = delete;
-	ConstantBuffer& operator=(const ConstantBuffer&) = delete;
-	~ConstantBuffer() noexcept {}
+	ConstantBufferBase(const ConstantBufferBase&) = delete;
+	ConstantBufferBase& operator=(const ConstantBufferBase&) = delete;
+	virtual ~ConstantBufferBase() noexcept {}
 
-	template <typename T>
-	void CreateBuffer(D3D11_USAGE usage, unsigned int cpuAccessFlags, unsigned int miscFlags, unsigned int structuredByteStride, void* initialData = nullptr);
+	ND inline ID3D11Buffer* GetRawBufferPointer() const noexcept { return m_buffer.get(); }
 
-	ND inline ID3D11Buffer* GetRawBufferPointer() const { return m_buffer.get(); }
-
-	inline void UpdateData(void* data)
+	inline void UpdateData(void* data) noexcept
 	{
 		WINRT_ASSERT(m_deviceResources != nullptr);
 
@@ -33,51 +30,57 @@ public:
 			data,			// Pointer to data to copy to the subresource
 			0u,				// "SourceRowPitch" - Not really sure what this is for, but it can be 0 for constant buffers
 			0u				// "SourceDepthPitch" - Not really sure what this is for, but it can be 0 for constant buffers
-		);		
+		);
 	}
 
-private:
+protected:
 	std::shared_ptr<DeviceResources> m_deviceResources;
 	winrt::com_ptr<ID3D11Buffer>     m_buffer;
 };
 
-template <typename T>
-void ConstantBuffer::CreateBuffer(D3D11_USAGE usage, unsigned int cpuAccessFlags, unsigned int miscFlags, unsigned int structuredByteStride, void* initialData)
+template<typename T>
+class ConstantBuffer : public ConstantBufferBase
 {
-	WINRT_ASSERT(m_deviceResources != nullptr);
-
-	D3D11_BUFFER_DESC desc;
-	desc.ByteWidth = sizeof(T);
-	desc.Usage = usage;
-	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	desc.CPUAccessFlags = cpuAccessFlags;
-	desc.MiscFlags = miscFlags;
-	desc.StructureByteStride = structuredByteStride;
-
-	// MUST make sure we release the data in the buffer. Note that unlike ComPtr::ReleaseAndGetAddressOf(), I think that calling m_buffer.put() 
-	// doesn't actually release the underlying contents - I think we need to intentionally need to assign as nullptr first
-	m_buffer = nullptr;
-	
-	D3D11_SUBRESOURCE_DATA* data = nullptr;
-	D3D11_SUBRESOURCE_DATA _data{};
-
-	if (initialData != nullptr)
+public:
+	ConstantBuffer(std::shared_ptr<DeviceResources> deviceResources, D3D11_USAGE usage, unsigned int cpuAccessFlags, unsigned int miscFlags, unsigned int structuredByteStride, void* initialData = nullptr) noexcept :
+		ConstantBufferBase(deviceResources)
 	{
-		_data.pSysMem = initialData;
-		_data.SysMemPitch = 0;			// Only relevant for 2D/3D textures
-		_data.SysMemSlicePitch = 0;		// Only relevant for 2D/3D textures
+		D3D11_BUFFER_DESC desc;
+		desc.ByteWidth = sizeof(T);
+		desc.Usage = usage;
+		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		desc.CPUAccessFlags = cpuAccessFlags;
+		desc.MiscFlags = miscFlags;
+		desc.StructureByteStride = structuredByteStride;
 
-		data = &_data;
+		// MUST make sure we release the data in the buffer. Note that unlike ComPtr::ReleaseAndGetAddressOf(), I think that calling m_buffer.put() 
+		// doesn't actually release the underlying contents - I think we need to intentionally need to assign as nullptr first
+		m_buffer = nullptr;
+
+		D3D11_SUBRESOURCE_DATA* pData = nullptr;
+		D3D11_SUBRESOURCE_DATA data{};
+
+		if (initialData != nullptr)
+		{
+			data.pSysMem = initialData;
+			data.SysMemPitch = 0;			// Only relevant for 2D/3D textures
+			data.SysMemSlicePitch = 0;		// Only relevant for 2D/3D textures
+
+			pData = &data;
+		}
+
+		winrt::check_hresult(
+			m_deviceResources->GetD3DDevice()->CreateBuffer(
+				&desc,			// Use the description we just created
+				pData,			// Fill the buffer with the passed in data (if nullptr, will not fill with any data)
+				m_buffer.put()	// Assign result to buffer - See note above about using put()
+			)
+		);
 	}
-
-	winrt::check_hresult(
-		m_deviceResources->GetD3DDevice()->CreateBuffer(
-			&desc,			// Use the description we just created
-			data,			// Fill the buffer with the passed in data (if nullptr, will not fill with any data)
-			m_buffer.put()	// Assign result to buffer - See note above about using put()
-		)
-	);
-}
+	ConstantBuffer(const ConstantBuffer&) = delete;
+	ConstantBuffer& operator=(const ConstantBuffer&) = delete;
+	virtual ~ConstantBuffer() noexcept override {}
+};
 
 // ========================================================================================================================================
 // Constant Buffer Array
@@ -104,7 +107,7 @@ public:
 	ConstantBufferArray& operator=(const ConstantBufferArray&) = delete;
 	~ConstantBufferArray() noexcept {}
 
-	inline void AddBuffer(std::shared_ptr<ConstantBuffer> buffer) noexcept
+	inline void AddBuffer(std::shared_ptr<ConstantBufferBase> buffer) noexcept
 	{
 		WINRT_ASSERT(buffer != nullptr);
 		m_buffers.push_back(buffer);
@@ -152,5 +155,5 @@ public:
 protected:
 	std::shared_ptr<DeviceResources> m_deviceResources;
 	std::vector<ID3D11Buffer*> m_rawBufferPointers;
-	std::vector<std::shared_ptr<ConstantBuffer>> m_buffers;
+	std::vector<std::shared_ptr<ConstantBufferBase>> m_buffers;
 };
