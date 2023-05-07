@@ -48,5 +48,5 @@ private:
 
 	std::unique_ptr<Camera> m_camera;
 
-	DirectX::XMFLOAT3 m_translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	DirectX::XMFLOAT3 m_translation = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
 };

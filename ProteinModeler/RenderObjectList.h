@@ -25,10 +25,8 @@ public:
 
 		DirectX::XMFLOAT4X4 world;
 		XMStoreFloat4x4(&world,
-			XMMatrixTranspose(
-				XMMatrixScaling(m_scaling.x, m_scaling.y, m_scaling.z) *
-				XMMatrixTranslation(m_translation->x, m_translation->y, m_translation->z)
-			)
+			XMMatrixScaling(m_scaling.x, m_scaling.y, m_scaling.z) *
+			XMMatrixTranslation(m_translation->x, m_translation->y, m_translation->z)
 		);
 		return world;
 	}
@@ -115,15 +113,14 @@ public:
 
 private:
 	std::shared_ptr<DeviceResources> m_deviceResources;
-
-	MeshInstance m_mesh;
+	MeshInstance					 m_mesh;
 
 	// Right now, each instance just requires an index into the materials array
 	winrt::com_ptr<ID3D11Buffer> m_instanceBuffer;
 
 	std::function<void(const RenderObjectList*, size_t, size_t)> m_bufferUpdateFn = [](const RenderObjectList*, size_t, size_t) {};
 
-	std::vector<RenderObject> m_renderObjects;
+	std::vector<RenderObject>		 m_renderObjects;
 	std::vector<DirectX::XMFLOAT4X4> m_worldMatrices;
-	std::vector<unsigned int> m_materialIndices;
+	std::vector<unsigned int>		 m_materialIndices;
 };

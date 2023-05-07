@@ -233,11 +233,11 @@ void Renderer::Render()
     // Apply the pipeline config for each list of render objects, render each object, then move onto the next config
     for (auto& configAndObjectList : m_configsAndObjectLists)
     {
-        std::unique_ptr<PipelineConfig>& config = std::get<0>(configAndObjectList);
-        config->ApplyConfig();
+        // Pipeline config
+        std::get<0>(configAndObjectList)->ApplyConfig();
 
-        std::unique_ptr<MeshSetBase>& ms = std::get<1>(configAndObjectList);
-        ms->BindToIA();
+        // MeshSet
+        std::get<1>(configAndObjectList)->BindToIA();
 
         std::vector<RenderObjectList>& objectLists = std::get<2>(configAndObjectList);
         for (unsigned int iii = 0; iii < objectLists.size(); ++iii)
