@@ -23,6 +23,12 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="Simulation.cpp">
+      <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="MathHelper.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -63,6 +69,18 @@
     <ClInclude Include="Camera.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Simulation.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Structs.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="MathHelper.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">
@@ -100,10 +118,19 @@
     <Filter Include="Rendering\Shaders">
       <UniqueIdentifier>{ce985f00-38c7-4a55-8276-6bf542c056ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Simulation">
+      <UniqueIdentifier>{9bd8293e-36dc-449e-9394-cf382f66ad98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{387280b8-ee02-47a1-95b0-7eea00e76ee4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="PropertySheet.props" />
     <None Include="packages.config" />
+    <None Include="Lighting.hlsli">
+      <Filter>Rendering\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
@@ -113,6 +140,12 @@
       <Filter>Rendering\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="BoxPixelShader.hlsl">
+      <Filter>Rendering\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShaderInstanced.hlsl">
+      <Filter>Rendering\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShaderInstanced.hlsl">
       <Filter>Rendering\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

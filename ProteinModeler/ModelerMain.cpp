@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ModelerMain.h"
+#include "Timer.h"
 
 using winrt::Windows::Foundation::AsyncStatus;
 using winrt::Windows::Foundation::IAsyncAction;
@@ -17,7 +18,14 @@ ModelerMain::ModelerMain(const std::shared_ptr<DeviceResources>& deviceResources
 {
     m_deviceResources->RegisterDeviceNotify(this);
 
-    m_renderer = std::make_unique<Renderer>(m_deviceResources);
+    m_simulation = std::make_unique<Simulation>();
+
+    m_simulation->Add(Element::Helium, { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f });
+    m_simulation->Add(Element::Helium, { 0.0f, 0.0f, 0.0f }, { -1.0f, 0.0f, 0.0f });
+    //for (unsigned int iii = 0; iii < 20; ++iii)
+    //    m_simulation->Add(Element::Hydrogen, { 0.0f, 0.0f, 0.0f }, { iii / 57.0f,  iii / 48.0f,  iii / 55.0f });
+
+    m_renderer = std::make_unique<Renderer>(m_deviceResources, m_simulation.get());
 }
 
 ModelerMain::~ModelerMain()
@@ -79,12 +87,28 @@ void ModelerMain::StartRenderLoop()
     // Create a task that will be run on a background thread.
     auto workItemHandler = WorkItemHandler([this](IAsyncAction action)
         {
+            Timer timer;
+
+            // Start the simulation
+            m_simulation->Play();
+
             // Calculate the updated frame and render once per vertical blanking interval.
             while (action.Status() == AsyncStatus::Started)
             {
                 concurrency::critical_section::scoped_lock lock(m_criticalSection);
-                Update();
+
+                // Update =========================================================================
+                timer.Tick([&]()
+                    {
+                        m_simulation->Update(timer);
+                        m_renderer->Update(timer);
+                    }
+                );
+
+                // Render =========================================================================
                 m_renderer->Render();
+
+                // Present ========================================================================
                 m_deviceResources->Present();
 
                 if (!m_haveFocus)
@@ -94,6 +118,8 @@ void ModelerMain::StartRenderLoop()
                     break;
                 }
             }
+
+            m_simulation->Pause();
         });
 
     // Run task on a dedicated high priority background thread.
@@ -102,9 +128,5 @@ void ModelerMain::StartRenderLoop()
 void ModelerMain::StopRenderLoop() 
 {
     m_renderLoopWorker.Cancel();
-}
-
-void ModelerMain::Update()
-{
-
+    m_simulation->Pause();
 }

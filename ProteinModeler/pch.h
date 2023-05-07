@@ -28,6 +28,8 @@
 #include "winrt/Microsoft.UI.Xaml.Media.h"
 #include "winrt/Microsoft.UI.Xaml.XamlTypeInfo.h"
 
+#include <profileapi.h> // For QueryPerformanceFrequency and QueryPerformanceTimer (See Timer.h)
+
 #include <functional>
 #include <memory>
 #include <vector>

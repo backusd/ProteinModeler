@@ -5,7 +5,7 @@ using namespace DirectX;
 
 Camera::Camera(const D3D11_VIEWPORT& viewport) noexcept :
 	m_viewport(viewport),
-    m_eye{ 0.0f, 0.0f, -5.0f },
+    m_eye{ 0.0f, 0.0f, -10.0f },
     m_at{ 0.0f, 0.0f, 0.0f },
     m_up{ 0.0f, 1.0f, 0.0f }
 {
@@ -50,4 +50,9 @@ void Camera::SetViewport(const D3D11_VIEWPORT& viewport) noexcept
 {
     m_viewport = viewport;
     CreateProjectionMatrix();
+}
+
+void Camera::Update(const Timer&)
+{
+
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-
+#include "Timer.h"
 
 class Camera
 {
@@ -12,6 +12,8 @@ public:
 	ND DirectX::XMFLOAT3 Position() const noexcept;
 
 	void SetViewport(const D3D11_VIEWPORT& viewport) noexcept;
+
+	void Update(const Timer& timer);
 
 private:
 	ND inline float AspectRatio() const noexcept { return m_viewport.Width / m_viewport.Height; }

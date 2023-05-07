@@ -1,20 +1,27 @@
 #include "pch.h"
 #include "Renderer.h"
 
-using DirectX::XMFLOAT3;
+using namespace DirectX;
 
-Renderer::Renderer(std::shared_ptr<DeviceResources> deviceResources) :
+Renderer::Renderer(std::shared_ptr<DeviceResources> deviceResources, Simulation* simulation) :
     m_deviceResources(deviceResources),
+    m_simulation(simulation),
     m_initialized(false),
     m_gameResourcesLoaded(false),
     m_viewport(CD3D11_VIEWPORT(0.0f, 0.0f, 100.0f, 100.0f)), // Assign dummy values for the viewport - this will be updated when the UI is created and triggers ViewportGrid_SizeChanged
     m_camera(nullptr)
 {
+    WINRT_ASSERT(simulation != nullptr);
+
     m_camera = std::make_unique<Camera>(m_viewport);
 
     CreateDeviceDependentResources();
     CreateWindowSizeDependentResources();
 
+    m_materials = std::make_unique<MaterialsArray>();
+    CreateMaterials();
+
+    CreateMainPipelineConfig();
     CreateBoxPipelineConfig();
 }
 
@@ -40,6 +47,203 @@ void Renderer::ReleaseDeviceDependentResources()
     //    m_gameHud->ReleaseDeviceDependentResources();
 }
 
+void Renderer::CreateMaterials()
+{
+    // Load the data
+    for (unsigned int iii = 0; iii < NUM_MATERIALS; ++iii)
+    {
+        m_materials->materials[iii].DiffuseAlbedo = DirectX::XMFLOAT4(0.5f, 0.2f, 0.1f, 1.0f);
+        m_materials->materials[iii].FresnelR0 = DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f);
+        m_materials->materials[iii].Shininess = 0.2f;
+    }
+}
+
+void Renderer::CreateMainPipelineConfig()
+{
+    // Shaders
+    std::unique_ptr<PixelShader> ps = std::make_unique<PixelShader>(m_deviceResources, L"PixelShaderInstanced.cso");
+    std::unique_ptr<VertexShader> vs = std::make_unique<VertexShader>(m_deviceResources, L"VertexShaderInstanced.cso");
+
+    // Input Layout
+    std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements;
+    inputElements.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,                            0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+    inputElements.push_back({ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+    // Instance Data ---------------------------------------------
+    inputElements.push_back({ "MATERIAL_INDEX", 0, DXGI_FORMAT_R32_UINT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
+    std::unique_ptr<InputLayout> il = std::make_unique<InputLayout>(m_deviceResources, inputElements, vs.get());
+
+    // Create Rasterizer State
+    D3D11_RASTERIZER_DESC rasterDesc; // Fill with default values for now
+    rasterDesc.AntialiasedLineEnable = false;
+    rasterDesc.CullMode = D3D11_CULL_BACK;
+    rasterDesc.DepthBias = 0;
+    rasterDesc.DepthBiasClamp = 0.0f;
+    rasterDesc.DepthClipEnable = true;
+    rasterDesc.FillMode = D3D11_FILL_SOLID; // D3D11_FILL_WIREFRAME; // ;
+    rasterDesc.FrontCounterClockwise = false;
+    rasterDesc.MultisampleEnable = false;
+    rasterDesc.ScissorEnable = false;
+    rasterDesc.SlopeScaledDepthBias = 0.0f;
+    std::unique_ptr<RasterizerState> rs = std::make_unique<RasterizerState>(m_deviceResources, rasterDesc);
+
+    // Blend State
+    D3D11_BLEND_DESC blendDesc;
+    blendDesc.AlphaToCoverageEnable = false;
+    blendDesc.IndependentBlendEnable = false;
+    blendDesc.RenderTarget[0].BlendEnable = false;
+    blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+    blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    std::unique_ptr<BlendState> bs = std::make_unique<BlendState>(m_deviceResources, blendDesc);
+
+    // Depth Stencil State
+    D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+    depthStencilDesc.DepthEnable = true;
+    depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+    depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+    depthStencilDesc.StencilEnable = false;
+    depthStencilDesc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+    depthStencilDesc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+    depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+    depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+    depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    std::unique_ptr<DepthStencilState> dss = std::make_unique<DepthStencilState>(m_deviceResources, depthStencilDesc);
+
+    // VS Buffers --------------
+    std::unique_ptr<ConstantBufferArray> vsCBA = std::make_unique<ConstantBufferArray>(m_deviceResources);
+
+    // Buffer #1: PassConstants - Will be updated by Scene once per rendering pass
+    std::shared_ptr<ConstantBuffer<PassConstants>> vsPassConstantsBuffer = 
+        std::make_shared<ConstantBuffer<PassConstants>>(m_deviceResources, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, 0u, 0u);
+
+    m_vsPerPassConstantsBuffers.push_back(vsPassConstantsBuffer); // The Scene must keep track of this buffer because it is responsible for updating it
+    vsCBA->AddBuffer(vsPassConstantsBuffer);
+
+    // Buffer #2: WorldMatrixInstances - Will be updated by each RenderObjectList before each Draw call
+    std::shared_ptr<ConstantBuffer<WorldMatrixInstances>> vsWorldMatrixInstancesBuffer = 
+        std::make_shared<ConstantBuffer<WorldMatrixInstances>>(m_deviceResources, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, 0u, 0u);
+
+    vsCBA->AddBuffer(vsWorldMatrixInstancesBuffer);
+
+    // PS Buffers --------------
+    std::unique_ptr<ConstantBufferArray> psCBA = std::make_unique<ConstantBufferArray>(m_deviceResources);
+
+    // Buffer #1: PassConstants - Will be updated by Scene once per rendering pass
+    std::shared_ptr<ConstantBuffer<PassConstants>> psPassConstantsBuffer 
+        = std::make_shared<ConstantBuffer<PassConstants>>(m_deviceResources, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, 0u, 0u);
+
+    m_psPerPassConstantsBuffers.push_back(psPassConstantsBuffer); 
+    psCBA->AddBuffer(psPassConstantsBuffer);
+
+    // Buffer #2: MaterialsArray - Buffer with all materials that will not ever be updated
+    WINRT_ASSERT(m_materials != nullptr); // Materials have not been created
+    m_materialsBuffer = std::make_shared<ConstantBuffer<MaterialsArray>>(m_deviceResources, D3D11_USAGE_DEFAULT, 0u, 0u, 0u, m_materials.get());
+
+    m_psPerPassConstantsBuffers.push_back(m_materialsBuffer);
+    psCBA->AddBuffer(m_materialsBuffer);
+
+    // Pipeline Configuration 
+    std::unique_ptr<PipelineConfig> config = std::make_unique<PipelineConfig>(m_deviceResources,
+        std::move(vs),
+        std::move(ps),
+        std::move(il),
+        std::move(rs),
+        std::move(bs),
+        std::move(dss),
+        std::move(vsCBA),
+        std::move(psCBA)
+    );
+
+    // -------------------------------------------------
+    // Mesh Set
+    std::unique_ptr<MeshSet<Vertex>> ms = std::make_unique<MeshSet<Vertex>>(m_deviceResources);
+    ms->SetVertexConversionFunction([](std::vector<GenericVertex> input) -> std::vector<Vertex>
+        {
+            std::vector<Vertex> output(input.size());
+            for (unsigned int iii = 0; iii < input.size(); ++iii)
+            {
+                output[iii].Pos = input[iii].Position;
+                output[iii].Normal = input[iii].Normal;
+            }
+            return output;
+        }
+    );
+    MeshInstance mi = ms->AddGeosphere(1.0f, 3);
+    ms->Finalize();
+
+    // RenderObjectLists ----------------------------------------------------------------------------
+    std::vector<DirectX::XMFLOAT3>& positions = m_simulation->Positions();
+    //std::vector<DirectX::XMFLOAT3>& velocities = m_simulation->Velocities(); Not needed right now
+    std::vector<Element>& elementTypes = m_simulation->ElementTypes();
+
+    std::vector<RenderObjectList> objectLists;
+    objectLists.emplace_back(m_deviceResources, mi);
+
+    float r;
+    unsigned int elementType;
+    for (unsigned int iii = 0; iii < positions.size(); ++iii)
+    {
+        elementType = static_cast<int>(elementTypes[iii]);
+        r = AtomicRadii[elementType];
+        objectLists.back().AddRenderObject({ r, r, r }, &positions.data()[iii], elementType - 1); // must subtract one because Hydrogen is 1, but its material is at index 0, etc.
+    }
+
+    objectLists.back().m_BufferUpdateFn = [](const RenderObjectList* renderObjectList, size_t startIndex, size_t endIndex)
+        {
+            auto context = renderObjectList->GetDeviceResources()->GetD3DDeviceContext();
+
+            const std::vector<DirectX::XMFLOAT4X4>& worldMatrices = renderObjectList->GetWorldMatrices();
+            const std::vector<unsigned int>& materialIndices = renderObjectList->GetMaterialIndices();
+
+            D3D11_MAPPED_SUBRESOURCE ms;
+
+            // Update the World buffers at VS slot 1 ------------------------------------------------------
+            ZeroMemory(&ms, sizeof(D3D11_MAPPED_SUBRESOURCE));
+            winrt::com_ptr<ID3D11Buffer> buffer = nullptr;
+
+            // TODO: Wrap this in a THROW_INFO_ONLY macro
+            context->VSGetConstantBuffers(1, 1, buffer.put());
+            winrt::check_hresult(
+                context->Map(buffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms)
+            );
+            // Only copy the elements between the start and end indices
+            memcpy(ms.pData, &worldMatrices.data()[startIndex], sizeof(DirectX::XMFLOAT4X4) * (endIndex - startIndex + 1));
+            // TODO: Wrap this in a THROW_INFO_ONLY macro
+            context->Unmap(buffer.get(), 0);
+
+            // --------------------------------------------------------------------------------------------
+            // Update the instance buffer and then bind it to the IA
+
+            winrt::com_ptr<ID3D11Buffer> instanceBuffer = renderObjectList->GetInstanceBuffer(); 
+
+            ZeroMemory(&ms, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+            winrt::check_hresult(
+                context->Map(instanceBuffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms)
+            );
+            // Only copy the elements between the start and end indices
+            memcpy(ms.pData, &materialIndices.data()[startIndex], sizeof(unsigned int) * (endIndex - startIndex + 1));
+            // TODO: Wrap this in a THROW_INFO_ONLY macro
+            context->Unmap(instanceBuffer.get(), 0);
+
+            UINT strides[1] = { sizeof(unsigned int) };
+            UINT offsets[1] = { 0u };
+            ID3D11Buffer* vertInstBuffers[1] = { instanceBuffer.get() };
+            // TODO: Wrap this in a THROW_INFO_ONLY macro
+            context->IASetVertexBuffers(1u, 1u, vertInstBuffers, strides, offsets);
+        };
+
+    m_configsAndObjectLists.push_back(std::make_tuple(std::move(config), std::move(ms), objectLists));
+}
 void Renderer::CreateBoxPipelineConfig()
 {
     // Shaders
@@ -172,13 +376,13 @@ void Renderer::CreateBoxPipelineConfig()
 
     // RenderObjectList ----------------------------------------------------------------------------
 
-    XMFLOAT3 scaling = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-    const XMFLOAT3* translation = &m_translation;
+    XMFLOAT3 scaling = m_simulation->BoxScaling();
+    const XMFLOAT3* translation = m_simulation->BoxTranslation();
 
     std::vector<RenderObjectList> objectLists;
     objectLists.emplace_back(m_deviceResources, mi);
     objectLists.back().AddRenderObject(scaling, translation, 0u);
-    objectLists.back().SetBufferUpdateCallback([this](const RenderObjectList* renderObjectList, size_t, size_t)
+    objectLists.back().m_BufferUpdateFn = [this](const RenderObjectList* renderObjectList, size_t, size_t)
         {
             using namespace DirectX;
 
@@ -193,7 +397,8 @@ void Renderer::CreateBoxPipelineConfig()
             const std::vector<DirectX::XMFLOAT4X4>& worldMatrices = renderObjectList->GetWorldMatrices();
             WINRT_ASSERT(worldMatrices.size() == 1); // There should be exactly 1 world matrix for 1 simulation box
 
-            XMMATRIX worldViewProjection = XMMatrixTranspose(XMLoadFloat4x4(&worldMatrices[0]) * viewProj);
+            // By default, the world matrices are stored PRE-transposed. Therefore, we need to untranspose it before computing the final matrix
+            XMMATRIX worldViewProjection = XMMatrixTranspose(XMMatrixTranspose(XMLoadFloat4x4(&worldMatrices[0])) * viewProj);
 
             // Update the World-View-Projection buffer at VS slot 0 ------------------------------------------------------            
             winrt::com_ptr<ID3D11Buffer> buffer = nullptr;
@@ -208,10 +413,84 @@ void Renderer::CreateBoxPipelineConfig()
 
             // TODO: Wrap this in THROW_INFO_ONLY macro
             context->Unmap(buffer.get(), 0);
-        }
-    );
+        };
 
     m_configsAndObjectLists.push_back(std::make_tuple(std::move(config), std::move(ms), objectLists));
+}
+
+void Renderer::Update(const Timer& timer)
+{
+    auto context = m_deviceResources->GetD3DDeviceContext();
+
+    // Update the Camera ---------------------------------------------------------------------
+    m_camera->Update(timer);
+
+    // Update Pass Constants -----------------------------------------------------------------
+
+    XMMATRIX view = m_camera->ViewMatrix();
+    XMMATRIX proj = m_camera->ProjectionMatrix();
+
+    XMVECTOR viewDet = DirectX::XMMatrixDeterminant(view);
+    XMMATRIX invView = DirectX::XMMatrixInverse(&viewDet, view);
+
+    XMVECTOR projDet = DirectX::XMMatrixDeterminant(proj);
+    XMMATRIX invProj = DirectX::XMMatrixInverse(&projDet, proj);
+
+    XMMATRIX viewProj = DirectX::XMMatrixMultiply(view, proj);
+    XMVECTOR viewProjDet = DirectX::XMMatrixDeterminant(viewProj);
+    XMMATRIX invViewProj = DirectX::XMMatrixInverse(&viewProjDet, viewProj);
+
+    DirectX::XMStoreFloat4x4(&m_passConstants.View, DirectX::XMMatrixTranspose(view));
+    DirectX::XMStoreFloat4x4(&m_passConstants.InvView, DirectX::XMMatrixTranspose(invView));
+    DirectX::XMStoreFloat4x4(&m_passConstants.Proj, DirectX::XMMatrixTranspose(proj));
+    DirectX::XMStoreFloat4x4(&m_passConstants.InvProj, DirectX::XMMatrixTranspose(invProj));
+    DirectX::XMStoreFloat4x4(&m_passConstants.ViewProj, DirectX::XMMatrixTranspose(viewProj));
+    DirectX::XMStoreFloat4x4(&m_passConstants.InvViewProj, DirectX::XMMatrixTranspose(invViewProj));
+    m_passConstants.EyePosW = m_camera->Position();
+    float width = m_deviceResources->GetRenderTargetSize().Width;
+    float height = m_deviceResources->GetRenderTargetSize().Height;
+    m_passConstants.RenderTargetSize = XMFLOAT2(width, height);
+    m_passConstants.InvRenderTargetSize = XMFLOAT2(1.0f / width, 1.0f / height);
+    m_passConstants.NearZ = 1.0f;
+    m_passConstants.FarZ = 1000.0f;
+    m_passConstants.TotalTime = static_cast<float>(timer.GetTotalSeconds());
+    m_passConstants.DeltaTime = static_cast<float>(timer.GetElapsedSeconds());
+    m_passConstants.AmbientLight = { 0.25f, 0.25f, 0.35f, 1.0f };
+
+    XMVECTOR lightDir = -MathHelper::SphericalToCartesian(1.0f, 1.25f * XM_PI, XM_PIDIV4);
+    DirectX::XMStoreFloat3(&m_passConstants.Lights[0].Direction, lightDir);
+    m_passConstants.Lights[0].Strength = { 1.0f, 1.0f, 0.9f };
+
+    // Update the constant buffer with the new matrix values
+    // VS
+    D3D11_MAPPED_SUBRESOURCE ms;
+    ZeroMemory(&ms, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+    winrt::check_hresult(
+        context->Map(m_vsPerPassConstantsBuffers[0]->GetRawBufferPointer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms)
+    );
+    memcpy(ms.pData, &m_passConstants, sizeof(PassConstants));
+    // TODO: Wrap next line in THROW_INFO_ONLY macro
+    context->Unmap(m_vsPerPassConstantsBuffers[0]->GetRawBufferPointer(), 0);
+
+    // PS
+    ZeroMemory(&ms, sizeof(D3D11_MAPPED_SUBRESOURCE));
+    winrt::check_hresult(
+        context->Map(m_psPerPassConstantsBuffers[0]->GetRawBufferPointer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms)
+    );
+    memcpy(ms.pData, &m_passConstants, sizeof(PassConstants));
+    // TODO: Wrap next line in THROW_INFO_ONLY macro
+    context->Unmap(m_psPerPassConstantsBuffers[0]->GetRawBufferPointer(), 0);
+
+    // Update all render object lists
+    for (auto& configAndObjectList : m_configsAndObjectLists)
+    {
+        std::vector<RenderObjectList>& objectLists = std::get<2>(configAndObjectList);
+        for (unsigned int iii = 0; iii < objectLists.size(); ++iii)
+        {
+            objectLists[iii].Update(timer);
+        }
+    }
 }
 
 void Renderer::Render()

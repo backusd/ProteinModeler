@@ -3,6 +3,8 @@
 #include "DeviceResources.h"
 #include "ModelerUIControl.h"
 #include "Renderer.h"
+#include "Simulation.h"
+
 
 #include <ppl.h>
 
@@ -31,7 +33,6 @@ public:
 
 private:
     void UpdateLayoutState();
-    void Update();
 
 
 private:
@@ -41,6 +42,7 @@ private:
     IModelerUIControl* m_uiControl;
 
     std::unique_ptr<Renderer> m_renderer;
+    std::unique_ptr<Simulation> m_simulation;
 
     Concurrency::critical_section            m_criticalSection;
     winrt::Windows::Foundation::IAsyncAction m_renderLoopWorker;
