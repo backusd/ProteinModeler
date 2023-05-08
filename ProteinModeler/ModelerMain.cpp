@@ -17,7 +17,7 @@ ModelerMain::ModelerMain(const std::shared_ptr<DeviceResources>& deviceResources
     m_simulation = std::make_unique<Simulation>();
 
     m_simulation->Add(Element::Helium, { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f });
-    m_simulation->Add(Element::Helium, { 0.0f, 0.0f, 0.0f }, { -1.0f, 0.0f, 0.0f });
+    //m_simulation->Add(Element::Helium, { 0.0f, 0.0f, 0.0f }, { -1.0f, 0.0f, 0.0f });
     //for (unsigned int iii = 0; iii < 20; ++iii)
     //    m_simulation->Add(Element::Hydrogen, { 0.0f, 0.0f, 0.0f }, { iii / 57.0f,  iii / 48.0f,  iii / 55.0f });
 

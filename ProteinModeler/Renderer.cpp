@@ -185,8 +185,8 @@ void Renderer::CreateMainPipelineConfig()
     //std::vector<DirectX::XMFLOAT3>& velocities = m_simulation->Velocities(); Not needed right now
     std::vector<Element>& elementTypes = m_simulation->ElementTypes();
 
-    std::vector<RenderObjectList> objectLists;
-    objectLists.emplace_back(m_deviceResources, mi);
+    // NOTE: Template parameter specifies the data type used by the instance buffer
+    std::unique_ptr<RenderObjectInstanced<unsigned int>> instancedObject = std::make_unique<RenderObjectInstanced<unsigned int>>(m_deviceResources, mi);
 
     float r;
     unsigned int elementType;
@@ -194,15 +194,15 @@ void Renderer::CreateMainPipelineConfig()
     {
         elementType = static_cast<int>(elementTypes[iii]);
         r = AtomicRadii[elementType];
-        objectLists.back().AddRenderObject({ r, r, r }, &positions.data()[iii], elementType - 1); // must subtract one because Hydrogen is 1, but its material is at index 0, etc.
+        instancedObject->AddInstance({ r, r, r }, &positions.data()[iii], elementType - 1); // must subtract one because Hydrogen is 1, but its material is at index 0, etc.
     }
 
-    objectLists.back().m_BufferUpdateFn = [](const RenderObjectList* renderObjectList, size_t startIndex, size_t endIndex)
+    instancedObject->m_BufferUpdateFn = [](const RenderObjectInstanced<unsigned int>* instancedObject, size_t startIndex, size_t endIndex)
         {
-            auto context = renderObjectList->GetDeviceResources()->GetD3DDeviceContext();
+            auto context = instancedObject->GetDeviceResources()->GetD3DDeviceContext();
 
-            const std::vector<DirectX::XMFLOAT4X4>& worldMatrices = renderObjectList->GetWorldMatrices();
-            const std::vector<unsigned int>& materialIndices = renderObjectList->GetMaterialIndices();
+            const std::vector<DirectX::XMFLOAT4X4>& worldMatrices = instancedObject->GetWorldMatrices();
+            const std::vector<unsigned int>& materialIndices = instancedObject->GetMaterialIndices();
 
             D3D11_MAPPED_SUBRESOURCE ms;
 
@@ -223,7 +223,7 @@ void Renderer::CreateMainPipelineConfig()
             // --------------------------------------------------------------------------------------------
             // Update the instance buffer and then bind it to the IA
 
-            winrt::com_ptr<ID3D11Buffer> instanceBuffer = renderObjectList->GetInstanceBuffer(); 
+            winrt::com_ptr<ID3D11Buffer> instanceBuffer = instancedObject->GetInstanceBuffer();
 
             ZeroMemory(&ms, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
@@ -234,15 +234,15 @@ void Renderer::CreateMainPipelineConfig()
             memcpy(ms.pData, &materialIndices.data()[startIndex], sizeof(unsigned int) * (endIndex - startIndex + 1));
             // TODO: Wrap this in a THROW_INFO_ONLY macro
             context->Unmap(instanceBuffer.get(), 0);
-
-            UINT strides[1] = { sizeof(unsigned int) };
-            UINT offsets[1] = { 0u };
-            ID3D11Buffer* vertInstBuffers[1] = { instanceBuffer.get() };
-            // TODO: Wrap this in a THROW_INFO_ONLY macro
-            context->IASetVertexBuffers(1u, 1u, vertInstBuffers, strides, offsets);
         };
 
-    m_configsAndObjectLists.push_back(std::make_tuple(std::move(config), std::move(ms), objectLists));
+    std::vector<std::unique_ptr<RenderableBase>> objects;
+    objects.push_back(std::move(instancedObject));
+
+    std::vector<MeshSetAndObjectList> meshSetAndObjectLists;
+    meshSetAndObjectLists.push_back(std::make_tuple(std::move(ms), std::move(objects)));
+
+    m_configsAndObjectLists.push_back(std::make_tuple(std::move(config), std::move(meshSetAndObjectLists)));
 }
 void Renderer::CreateBoxPipelineConfig()
 {
@@ -379,43 +379,44 @@ void Renderer::CreateBoxPipelineConfig()
     XMFLOAT3 scaling = m_simulation->BoxScaling();
     const XMFLOAT3* translation = m_simulation->BoxTranslation();
 
-    std::vector<RenderObjectList> objectLists;
-    objectLists.emplace_back(m_deviceResources, mi);
-    objectLists.back().AddRenderObject(scaling, translation, 0u);
-    objectLists.back().m_BufferUpdateFn = [this](const RenderObjectList* renderObjectList, size_t, size_t)
-        {
-            using namespace DirectX;
+    std::unique_ptr<RenderObject> object = std::make_unique<RenderObject>(m_deviceResources, mi, scaling, translation, 0u);
+    object->m_BufferUpdateFn = [this](const RenderObject* object)
+    {
+        auto context = m_deviceResources->GetD3DDeviceContext();
 
-            auto context = renderObjectList->GetDeviceResources()->GetD3DDeviceContext();
+        D3D11_MAPPED_SUBRESOURCE ms;
+        ZeroMemory(&ms, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
-            D3D11_MAPPED_SUBRESOURCE ms;
-            ZeroMemory(&ms, sizeof(D3D11_MAPPED_SUBRESOURCE));
+        Camera* camera = m_camera.get();
+        XMMATRIX viewProj = camera->ViewMatrix() * camera->ProjectionMatrix();
 
-            Camera* camera = m_camera.get();
-            XMMATRIX viewProj = camera->ViewMatrix() * camera->ProjectionMatrix();
+        // By default, the world matrices are computed PRE-transposed. This is done by default because the overwhelming majority of
+        // the time, we will NOT be computing the World-View-Projection matrix on the CPU and instead be computing it in the VertexShader.
+        // Therefore, we need to untranspose it before computing the final matrix.
+        XMMATRIX worldViewProjection = XMMatrixTranspose(XMMatrixTranspose(object->WorldMatrix()) * viewProj);
 
-            const std::vector<DirectX::XMFLOAT4X4>& worldMatrices = renderObjectList->GetWorldMatrices();
-            WINRT_ASSERT(worldMatrices.size() == 1); // There should be exactly 1 world matrix for 1 simulation box
+        // Update the World-View-Projection buffer at VS slot 0 ------------------------------------------------------            
+        winrt::com_ptr<ID3D11Buffer> buffer = nullptr;
 
-            // By default, the world matrices are stored PRE-transposed. Therefore, we need to untranspose it before computing the final matrix
-            XMMATRIX worldViewProjection = XMMatrixTranspose(XMMatrixTranspose(XMLoadFloat4x4(&worldMatrices[0])) * viewProj);
+        // TODO: Wrap this in THROW_INFO_ONLY macro
+        context->VSGetConstantBuffers(0, 1, buffer.put());
 
-            // Update the World-View-Projection buffer at VS slot 0 ------------------------------------------------------            
-            winrt::com_ptr<ID3D11Buffer> buffer = nullptr;
+        winrt::check_hresult(
+            context->Map(buffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms)
+        );
+        memcpy(ms.pData, &worldViewProjection, sizeof(XMMATRIX));
 
-            // TODO: Wrap this in THROW_INFO_ONLY macro
-            context->VSGetConstantBuffers(0, 1, buffer.put());
+        // TODO: Wrap this in THROW_INFO_ONLY macro
+        context->Unmap(buffer.get(), 0);
+    };
 
-            winrt::check_hresult(
-                context->Map(buffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms)
-            );
-            memcpy(ms.pData, &worldViewProjection, sizeof(XMMATRIX));
+    std::vector<std::unique_ptr<RenderableBase>> objects;
+    objects.push_back(std::move(object));
 
-            // TODO: Wrap this in THROW_INFO_ONLY macro
-            context->Unmap(buffer.get(), 0);
-        };
+    std::vector<MeshSetAndObjectList> meshSetAndObjectLists;
+    meshSetAndObjectLists.push_back(std::make_tuple(std::move(ms), std::move(objects)));
 
-    m_configsAndObjectLists.push_back(std::make_tuple(std::move(config), std::move(ms), objectLists));
+    m_configsAndObjectLists.push_back(std::make_tuple(std::move(config), std::move(meshSetAndObjectLists)));
 }
 
 void Renderer::Update(const Timer& timer)
@@ -483,12 +484,26 @@ void Renderer::Update(const Timer& timer)
     context->Unmap(m_psPerPassConstantsBuffers[0]->GetRawBufferPointer(), 0);
 
     // Update all render object lists
+//    for (auto& configAndObjectList : m_configsAndObjectLists)
+//    {
+//        std::vector<std::unique_ptr<RenderableBase>>& objectLists = std::get<2>(configAndObjectList);
+//        for (unsigned int iii = 0; iii < objectLists.size(); ++iii)
+//        {
+//            objectLists[iii]->Update(timer);
+//        }
+//    }
+
     for (auto& configAndObjectList : m_configsAndObjectLists)
     {
-        std::vector<RenderObjectList>& objectLists = std::get<2>(configAndObjectList);
-        for (unsigned int iii = 0; iii < objectLists.size(); ++iii)
+        // Iterate over vector of MeshSet & ObjectList tuple
+        for (auto& meshSetAndObjectList : std::get<1>(configAndObjectList))
         {
-            objectLists[iii].Update(timer);
+            // List of RenderObjects
+            std::vector<std::unique_ptr<RenderableBase>>& objectLists = std::get<1>(meshSetAndObjectList);
+            for (unsigned int iii = 0; iii < objectLists.size(); ++iii)
+            {
+                objectLists[iii]->Update(timer);
+            }
         }
     }
 }
@@ -509,18 +524,38 @@ void Renderer::Render()
     context->RSSetViewports(1, &m_viewport);
 
     // Apply the pipeline config for each list of render objects, render each object, then move onto the next config
+//    for (auto& configAndObjectList : m_configsAndObjectLists)
+//    {
+//        // Pipeline config
+//        std::get<0>(configAndObjectList)->ApplyConfig();
+//
+//        // MeshSet
+//        std::get<1>(configAndObjectList)->BindToIA();
+//
+//        std::vector<std::unique_ptr<RenderableBase>>& objectLists = std::get<2>(configAndObjectList);
+//        for (unsigned int iii = 0; iii < objectLists.size(); ++iii)
+//        {
+//            objectLists[iii]->Render();
+//        }
+//    }
+
     for (auto& configAndObjectList : m_configsAndObjectLists)
     {
         // Pipeline config
         std::get<0>(configAndObjectList)->ApplyConfig();
 
-        // MeshSet
-        std::get<1>(configAndObjectList)->BindToIA();
-
-        std::vector<RenderObjectList>& objectLists = std::get<2>(configAndObjectList);
-        for (unsigned int iii = 0; iii < objectLists.size(); ++iii)
+        // Iterate over vector of MeshSet & ObjectList tuple
+        for (auto& meshSetAndObjectList : std::get<1>(configAndObjectList))
         {
-            objectLists[iii].Render();
+            // MeshSet
+            std::get<0>(meshSetAndObjectList)->BindToIA();
+
+            // List of RenderObjects
+            std::vector<std::unique_ptr<RenderableBase>>& objectLists = std::get<1>(meshSetAndObjectList);
+            for (unsigned int iii = 0; iii < objectLists.size(); ++iii)
+            {
+                objectLists[iii]->Render();
+            }
         }
     }
 }

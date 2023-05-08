@@ -17,7 +17,14 @@
 
 class Renderer 
 {
-	using PipelineConfigAndObjectList = std::tuple<std::unique_ptr<PipelineConfig>, std::unique_ptr<MeshSetBase>, std::vector<RenderObjectList>>;
+	// The idea here is as follows: We want to be able to render as much as possible using a single pipeline configuration.
+	// Therefore, we use a tuple to associate a PipelineConfig with all of the objects/data that will be rendered using that
+	// config. The data largely consists of two things: 1) A MeshSet that holds 1+ meshes to be used during the rendering, and
+	// 2) a vector of Renderable objects which hold transformation data that reference into the MeshSet. However, because a scene
+	// will consist of many objects, it may not be feasible to put all necessary mesh data into a single MeshSet. Therefore, we
+	// allow for a vector of MeshSet-RenderObjects tuples so that we can iterate over multiple MeshSets if necessary.
+	using MeshSetAndObjectList = std::tuple<std::unique_ptr<MeshSetBase>, std::vector<std::unique_ptr<RenderableBase>>>;
+	using PipelineConfigAndObjectList = std::tuple<std::unique_ptr<PipelineConfig>, std::vector<MeshSetAndObjectList>>;
 
 public:
 	Renderer(std::shared_ptr<DeviceResources> deviceResources, Simulation* simulation);
