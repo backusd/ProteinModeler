@@ -53,11 +53,17 @@ void ModelerMain::WindowActivationChanged(CoreWindowActivationState activationSt
     if (activationState == CoreWindowActivationState::Deactivated)
     {
         m_haveFocus = false;
+
     }
     else if (activationState == CoreWindowActivationState::CodeActivated ||
              activationState == CoreWindowActivationState::PointerActivated)
     {
         m_haveFocus = true;
+
+        if (m_renderLoopWorker == nullptr || m_renderLoopWorker.Status() != AsyncStatus::Started)
+        {
+            StartRenderLoop();
+        }
     }
 }
 
@@ -78,20 +84,19 @@ void ModelerMain::UpdateLayoutState()
 
 void ModelerMain::StartRenderLoop() 
 {
-    // If the animation render loop is already running then do not start another thread.
     if (m_renderLoopWorker != nullptr && m_renderLoopWorker.Status() == AsyncStatus::Started)
     {
         return;
     }
-
+ 
     // Create a task that will be run on a background thread.
     auto workItemHandler = WorkItemHandler([this](IAsyncAction action)
         {
             Timer timer;
-
+ 
             // Start the simulation
-            m_simulation->Play();
-
+            m_simulation->Play();            
+ 
             // Calculate the updated frame and render once per vertical blanking interval.
             while (action.Status() == AsyncStatus::Started)
             {
@@ -104,13 +109,13 @@ void ModelerMain::StartRenderLoop()
                         m_renderer->Update(timer);
                     }
                 );
-
+ 
                 // Render =========================================================================
                 m_renderer->Render();
-
+ 
                 // Present ========================================================================
                 m_deviceResources->Present();
-
+ 
                 if (!m_haveFocus)
                 {
                     // The app is in an inactive state so stop rendering
@@ -118,10 +123,10 @@ void ModelerMain::StartRenderLoop()
                     break;
                 }
             }
-
+ 
             m_simulation->Pause();
         });
-
+ 
     // Run task on a dedicated high priority background thread.
     m_renderLoopWorker = ThreadPool::RunAsync(workItemHandler, WorkItemPriority::High, WorkItemOptions::TimeSliced);
 }
