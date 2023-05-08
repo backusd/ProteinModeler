@@ -2,14 +2,10 @@
 #include "ModelerMain.h"
 #include "Timer.h"
 
-using winrt::Windows::Foundation::AsyncStatus;
-using winrt::Windows::Foundation::IAsyncAction;
-using winrt::Windows::System::Threading::ThreadPool;
-using winrt::Windows::System::Threading::WorkItemHandler;
-using winrt::Windows::System::Threading::WorkItemPriority;
-using winrt::Windows::System::Threading::WorkItemOptions;
-using winrt::Windows::UI::Core::CoreWindowActivationState;
-
+using namespace winrt;
+using namespace Windows::Foundation;
+using namespace Windows::System::Threading;
+using namespace Windows::UI::Core;
 
 ModelerMain::ModelerMain(const std::shared_ptr<DeviceResources>& deviceResources, IModelerUIControl* UIControl) :
     m_deviceResources(deviceResources),
