@@ -18,6 +18,6 @@ VertexOutput main(VertexInput input)
 {
     VertexOutput output;
     output.position = mul(float4(input.position, 1.0f), worldViewProjectionMatrix);
-    output.color = float4(0.0f, 0.0f, 0.0f, 1.0f);
+    output.color = float4(1.0f, 1.0f, 1.0f, 1.0f);
     return output;
 }

@@ -8,6 +8,8 @@
 
 #include <memory>
 
+#include "AtomViewModel.h"
+
 
 
 namespace winrt::ProteinModeler::implementation
@@ -58,8 +60,23 @@ namespace winrt::ProteinModeler::implementation
 
         bool m_windowVisible;
 
+        
+
     public:
         void ViewportGrid_SizeChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::SizeChangedEventArgs const& e);
+    
+    
+    public:
+        void BookSkuButton_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::RoutedEventArgs const& e);
+        winrt::ProteinModeler::AtomViewModel AtomsViewModel();
+    private:
+        winrt::ProteinModeler::AtomViewModel m_atomsViewModel;
+
+    
+        // Atom List View
+    public:
+        void AtomsListView_SelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const& e);
+        void AtomsListView_ItemClick(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::ItemClickEventArgs const& e);
     };
 }
 

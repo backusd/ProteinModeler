@@ -483,16 +483,6 @@ void Renderer::Update(const Timer& timer)
     // TODO: Wrap next line in THROW_INFO_ONLY macro
     context->Unmap(m_psPerPassConstantsBuffers[0]->GetRawBufferPointer(), 0);
 
-    // Update all render object lists
-//    for (auto& configAndObjectList : m_configsAndObjectLists)
-//    {
-//        std::vector<std::unique_ptr<RenderableBase>>& objectLists = std::get<2>(configAndObjectList);
-//        for (unsigned int iii = 0; iii < objectLists.size(); ++iii)
-//        {
-//            objectLists[iii]->Update(timer);
-//        }
-//    }
-
     for (auto& configAndObjectList : m_configsAndObjectLists)
     {
         // Iterate over vector of MeshSet & ObjectList tuple
@@ -515,29 +505,13 @@ void Renderer::Render()
     ID3D11RenderTargetView* const targets[1] = { m_deviceResources->GetBackBufferRenderTargetView() };
     context->OMSetRenderTargets(1u, targets, m_deviceResources->GetDepthStencilView());
 
-    float background[4] = { 0.3f, 0.0f, 0.6f, 1.0f };
+    float background[4] = { 0.16f, 0.16f, 0.16f, 1.0f };
     context->ClearRenderTargetView(m_deviceResources->GetBackBufferRenderTargetView(), background);
     context->ClearDepthStencilView(m_deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
     // Set the viewport
     // TODO: Wrap this in THROW_INFO_ONLY macro
     context->RSSetViewports(1, &m_viewport);
-
-    // Apply the pipeline config for each list of render objects, render each object, then move onto the next config
-//    for (auto& configAndObjectList : m_configsAndObjectLists)
-//    {
-//        // Pipeline config
-//        std::get<0>(configAndObjectList)->ApplyConfig();
-//
-//        // MeshSet
-//        std::get<1>(configAndObjectList)->BindToIA();
-//
-//        std::vector<std::unique_ptr<RenderableBase>>& objectLists = std::get<2>(configAndObjectList);
-//        for (unsigned int iii = 0; iii < objectLists.size(); ++iii)
-//        {
-//            objectLists[iii]->Render();
-//        }
-//    }
 
     for (auto& configAndObjectList : m_configsAndObjectLists)
     {

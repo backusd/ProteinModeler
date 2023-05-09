@@ -7,20 +7,35 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d">
+    <Page.Resources>
+        <SolidColorBrush x:Key="PanelBackground" Color="#333" />
+
+        <DataTemplate x:Name="AtomListViewItemCollapsed" x:Key="AtomListViewItemCollapsed" x:DataType="local:Atom">
+            <TextBlock Text="{x:Bind Name}" />
+        </DataTemplate>
+        <DataTemplate x:Name="AtomListViewItemExpanded" x:Key="AtomListViewItemExpanded" x:DataType="local:Atom">
+            <StackPanel>
+                <TextBlock Text="{x:Bind Name}" FontSize="30" Foreground="Red" HorizontalAlignment="Center" />
+                <TextBlock Text="EXTRA" FontSize="30" Foreground="Blue" Margin="0,10" />
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
 
     <SwapChainPanel x:Name="DXSwapChainPanel" 
                     SizeChanged="DXSwapChainPanel_SizeChanged"
                     CompositionScaleChanged="DXSwapChainPanel_CompositionScaleChanged">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="30" />
+            <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="40" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <muxc:MenuBar>
-            <muxc:MenuBarItem Title="File">
+        <muxc:MenuBar Grid.ColumnSpan="3" >
+            <muxc:MenuBarItem Title="File" >
                 <MenuFlyoutSubItem Text="New">
                     <MenuFlyoutItem Text="Plain Text Document"/>
                     <MenuFlyoutItem Text="Rich Text Document"/>
@@ -59,8 +74,42 @@
              We require the SwapChainPanel to encompass the entire app window so that render target back buffer
              can be made the same size as the entire app. From there, we can assign a subregion of the app as the
              viewport where the 3D scene will be rendered to. -->
-        <Grid x:Name="ViewportGrid" Grid.Row="1" SizeChanged="ViewportGrid_SizeChanged" />
+        <Grid x:Name="ViewportGrid" Grid.Row="1" Grid.RowSpan="2" SizeChanged="ViewportGrid_SizeChanged"  />
 
         <Button x:Name="myButton" Grid.Row="1" Click="ClickHandler">Click Me</Button>
+
+        
+        
+        
+        <!-- Right Side Grid -->
+        <Grid x:Name="RightSideGrid" Grid.Row="1" Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+
+            <!--- Grid to hold all information about atoms/molecules in the simulation-->
+            <Grid x:Name="SimulationContentsGrid" Grid.Row="0" Background="{StaticResource PanelBackground}" Margin="3" CornerRadius="5">
+
+                <ListView x:Name="AtomsListView" 
+                          ItemsSource="{x:Bind AtomsViewModel.Atoms}" 
+                          ItemTemplate="{StaticResource AtomListViewItemCollapsed}" 
+                          SelectionChanged="AtomsListView_SelectionChanged" 
+                          ItemClick="AtomsListView_ItemClick" 
+                          IsItemClickEnabled="True" />               
+
+            </Grid>
+
+            <!-- Grid to hold the settings for the scene/simulation -->
+            <Grid x:Name="SimulationSettingsGrid" Grid.Row="1" Background="{StaticResource PanelBackground}" Margin="3,0,3,3" CornerRadius="5">
+                <Button x:Name="BookSkuButton" Click="BookSkuButton_Click" Content="Click Me" />
+
+            </Grid>
+        </Grid>
+       
     </SwapChainPanel>
 </Page>

@@ -1,0 +1,11 @@
+// AtomViewModel.idl
+import "Atom.idl";
+
+namespace ProteinModeler
+{
+    runtimeclass AtomViewModel
+    {
+        AtomViewModel();
+        Windows.Foundation.Collections.IObservableVector<Atom> Atoms{ get; };
+    }
+}

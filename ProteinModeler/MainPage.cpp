@@ -7,11 +7,13 @@
 using namespace winrt;
 using namespace Windows::ApplicationModel;
 using namespace Windows::UI::Xaml;
+using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Core;
 using namespace Windows::Graphics::Display;
 
 namespace winrt::ProteinModeler::implementation
 {
+    // NOTE: Using uniform construction, so no need to call winrt::make to instantiate runtime types
     MainPage::MainPage() :
         m_windowVisible(false)
     {
@@ -170,13 +172,56 @@ namespace winrt::ProteinModeler::implementation
     {
         myButton().Content(box_value(L"Clicked"));
     }
+
+
+
+
+
+    void MainPage::BookSkuButton_Click(IInspectable const&, RoutedEventArgs const&)
+    {
+        ProteinModeler::Atom atom(L"Hydrogen");
+        AtomsViewModel().Atoms().Append(atom);
+    }
+    ProteinModeler::AtomViewModel MainPage::AtomsViewModel()
+    {
+        return m_atomsViewModel;
+    }
+
+
+
+
+
+    void MainPage::AtomsListView_SelectionChanged(IInspectable const& sender, SelectionChangedEventArgs const& e)
+    {
+        for (auto item : e.AddedItems())
+        {
+            auto lvi = sender.as<ListView>().ContainerFromItem(item).as<ListViewItem>();
+            lvi.ContentTemplate(this->Resources().Lookup(box_value(L"AtomListViewItemExpanded")).as<DataTemplate>()); 
+        }
+
+        for (auto item : e.RemovedItems())
+        {
+            auto lvi = sender.as<ListView>().ContainerFromItem(item).as<ListViewItem>();
+            lvi.ContentTemplate(this->Resources().Lookup(box_value(L"AtomListViewItemCollapsed")).as<DataTemplate>());
+        }
+    }
+    void MainPage::AtomsListView_ItemClick(IInspectable const& sender, ItemClickEventArgs const& e)
+    {
+        DataTemplate collapsed = this->Resources().Lookup(box_value(L"AtomListViewItemCollapsed")).as<DataTemplate>();
+        DataTemplate expanded  = this->Resources().Lookup(box_value(L"AtomListViewItemExpanded")).as<DataTemplate>();
+
+        auto lvi = sender.as<ListView>().ContainerFromItem(e.ClickedItem()).as<ListViewItem>();
+
+        if (collapsed == lvi.ContentTemplate())
+        {
+            lvi.ContentTemplate(expanded);
+        }
+        else
+        {
+            lvi.ContentTemplate(collapsed);
+        }
+    }
 }
-
-
-
-
-
-
 
 
 

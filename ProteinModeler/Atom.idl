@@ -1,0 +1,9 @@
+// Atom.idl
+namespace ProteinModeler
+{
+    runtimeclass Atom : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        Atom(String name);
+        String Name;
+    }
+}

@@ -9,6 +9,8 @@
   <ItemGroup>
     <Midl Include="App.idl" />
     <Midl Include="MainPage.idl" />
+    <Midl Include="Atom.idl" />
+    <Midl Include="AtomViewModel.idl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -29,6 +31,8 @@
     <ClCompile Include="MathHelper.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="Atom.cpp" />
+    <ClCompile Include="AtomViewModel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -81,6 +85,8 @@
     <ClInclude Include="Timer.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Atom.h" />
+    <ClInclude Include="AtomViewModel.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">
