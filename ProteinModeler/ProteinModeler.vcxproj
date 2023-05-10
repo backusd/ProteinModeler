@@ -116,6 +116,7 @@
     <ClInclude Include="DepthStencilState.h" />
     <ClInclude Include="DeviceResources.h" />
     <ClInclude Include="DirectXHelper.h" />
+    <ClInclude Include="ElementTypeFormatter.h" />
     <ClInclude Include="InputLayout.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="MeshSet.h" />
@@ -164,6 +165,7 @@
     <ClCompile Include="AtomViewModel.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DeviceResources.cpp" />
+    <ClCompile Include="ElementTypeFormatter.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="ModelerMain.cpp" />
     <ClCompile Include="pch.cpp">
@@ -185,6 +187,7 @@
     </Midl>
     <Midl Include="Atom.idl" />
     <Midl Include="AtomViewModel.idl" />
+    <Midl Include="ElementTypeFormatter.idl" />
     <Midl Include="MainPage.idl">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Midl>

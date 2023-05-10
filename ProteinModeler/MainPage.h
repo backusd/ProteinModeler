@@ -9,6 +9,9 @@
 #include <memory>
 
 #include "AtomViewModel.h"
+#include "ElementTypeFormatter.h" // Do NOT remove this! Even though we don't reference it directly, one of the auto generated
+                                  // needs this header and does not include it for some reason. However, it does include MainPage.h
+                                  // so just include it here.
 
 
 
@@ -51,8 +54,6 @@ namespace winrt::ProteinModeler::implementation
 
         int32_t MyProperty();
         void MyProperty(int32_t value);
-
-        void ClickHandler(const Windows::Foundation::IInspectable& sender, const Windows::UI::Xaml::RoutedEventArgs& args);
 
     private:
         std::shared_ptr<DeviceResources>    m_deviceResources;

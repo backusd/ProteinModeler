@@ -168,10 +168,6 @@ namespace winrt::ProteinModeler::implementation
         throw hresult_not_implemented();
     }
 
-    void MainPage::ClickHandler(IInspectable const&, RoutedEventArgs const&)
-    {
-        myButton().Content(box_value(L"Clicked"));
-    }
 
 
 
@@ -179,7 +175,7 @@ namespace winrt::ProteinModeler::implementation
 
     void MainPage::BookSkuButton_Click(IInspectable const&, RoutedEventArgs const&)
     {
-        ProteinModeler::Atom atom(L"Hydrogen");
+        ProteinModeler::Atom atom(ElementType::Hydrogen, { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f });
         AtomsViewModel().Atoms().Append(atom);
     }
     ProteinModeler::AtomViewModel MainPage::AtomsViewModel()

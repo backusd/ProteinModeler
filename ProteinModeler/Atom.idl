@@ -1,9 +1,34 @@
 // Atom.idl
 namespace ProteinModeler
 {
+    struct Float3
+    {
+        Single x;
+        Single y;
+        Single z;
+    };
+
+    enum ElementType
+    {
+        None = 0,
+        Hydrogen = 1,
+        Helium = 2,
+        Lithium = 3,
+        Beryllium = 4,
+        Boron = 5,
+        Carbon = 6,
+        Nitrogen = 7,
+        Oxygen = 8,
+        Flourine = 9,
+        Neon = 10,
+    };
+
     runtimeclass Atom : Windows.UI.Xaml.Data.INotifyPropertyChanged
     {
-        Atom(String name);
-        String Name;
+        Atom(ElementType type, Float3 position, Float3 velocity);
+        
+        ElementType Type;
+        Float3 Position;
+        Float3 Velocity;
     }
 }

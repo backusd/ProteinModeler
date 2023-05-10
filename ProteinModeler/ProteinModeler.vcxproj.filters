@@ -11,6 +11,7 @@
     <Midl Include="MainPage.idl" />
     <Midl Include="Atom.idl" />
     <Midl Include="AtomViewModel.idl" />
+    <Midl Include="ElementTypeFormatter.idl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -33,6 +34,7 @@
     </ClCompile>
     <ClCompile Include="Atom.cpp" />
     <ClCompile Include="AtomViewModel.cpp" />
+    <ClCompile Include="ElementTypeFormatter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -87,6 +89,7 @@
     </ClInclude>
     <ClInclude Include="Atom.h" />
     <ClInclude Include="AtomViewModel.h" />
+    <ClInclude Include="ElementTypeFormatter.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">

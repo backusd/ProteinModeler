@@ -4,21 +4,48 @@
 
 namespace winrt::ProteinModeler::implementation
 {
-    Atom::Atom(winrt::hstring const& name) : m_name{ name }
+    Atom::Atom(winrt::ProteinModeler::ElementType const& type, winrt::ProteinModeler::Float3 const& position, winrt::ProteinModeler::Float3 const& velocity) :
+        m_type(type),
+        m_position(position),
+        m_velocity(velocity)
     {
     }
 
-    winrt::hstring Atom::Name()
+    winrt::ProteinModeler::ElementType Atom::Type()
     {
-        return m_name;
+        return m_type;
     }
-
-    void Atom::Name(winrt::hstring const& value)
+    void Atom::Type(winrt::ProteinModeler::ElementType const& value)
     {
-        if (m_name != value)
+        if (m_type != value)
         {
-            m_name = value;
-            m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{ L"Name" });
+            m_type = value;
+            m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{ L"Type" });
+        }
+    }
+
+    winrt::ProteinModeler::Float3 Atom::Position()
+    {
+        return m_position;
+    }
+    void Atom::Position(winrt::ProteinModeler::Float3 const& value)
+    {
+        if (m_position != value)
+        {
+            m_position = value;
+            m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{ L"Position" });
+        }
+    }
+    winrt::ProteinModeler::Float3 Atom::Velocity()
+    {
+        return m_velocity;
+    }
+    void Atom::Velocity(winrt::ProteinModeler::Float3 const& value)
+    {
+        if (m_velocity != value)
+        {
+            m_velocity = value;
+            m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{ L"Velocity" });
         }
     }
 

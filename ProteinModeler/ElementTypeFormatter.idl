@@ -1,0 +1,9 @@
+// ElementTypeFormatter.idl
+namespace ProteinModeler
+{
+    [default_interface]
+    runtimeclass ElementTypeFormatter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        ElementTypeFormatter();
+    }
+}

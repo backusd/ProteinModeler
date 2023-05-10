@@ -8,16 +8,49 @@
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d">
     <Page.Resources>
+        <local:ElementTypeFormatter x:Key="DefaultElementTypeFormatter"/>
         <SolidColorBrush x:Key="PanelBackground" Color="#333" />
 
         <DataTemplate x:Name="AtomListViewItemCollapsed" x:Key="AtomListViewItemCollapsed" x:DataType="local:Atom">
-            <TextBlock Text="{x:Bind Name}" />
+            <TextBlock Text="{x:Bind Type, Converter={StaticResource DefaultElementTypeFormatter}}" />
         </DataTemplate>
         <DataTemplate x:Name="AtomListViewItemExpanded" x:Key="AtomListViewItemExpanded" x:DataType="local:Atom">
-            <StackPanel>
-                <TextBlock Text="{x:Bind Name}" FontSize="30" Foreground="Red" HorizontalAlignment="Center" />
-                <TextBlock Text="EXTRA" FontSize="30" Foreground="Blue" Margin="0,10" />
-            </StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Padding="0,11,0,0" Grid.ColumnSpan="2" Text="{x:Bind Type, Converter={StaticResource DefaultElementTypeFormatter}}" />
+
+                <TextBlock Grid.Row="1" Text="Position:   X" FontSize="12" HorizontalAlignment="Right" Margin="0,6,10,0" />
+                <Slider Grid.Row="1" Grid.Column="1" Minimum="-10" Maximum="10" Value="{x:Bind Position.x}" />
+
+                <TextBlock Grid.Row="2" Text="Y" FontSize="12" HorizontalAlignment="Right" Margin="0,6,10,0" />
+                <Slider Grid.Row="2" Grid.Column="1" Minimum="-10" Maximum="10" Value="{x:Bind Position.y}" />
+
+                <TextBlock Grid.Row="3" Text="Z" FontSize="12" HorizontalAlignment="Right" Margin="0,6,10,0" />
+                <Slider Grid.Row="3" Grid.Column="1" Minimum="-10" Maximum="10" Value="{x:Bind Position.z}" />
+
+                <TextBlock Grid.Row="4" Text="Velocity:   X" FontSize="12" HorizontalAlignment="Right" Margin="0,6,10,0" />
+                <Slider Grid.Row="4" Grid.Column="1" Minimum="-10" Maximum="10" Value="{x:Bind Velocity.x}" />
+
+                <TextBlock Grid.Row="5" Text="Y" FontSize="12" HorizontalAlignment="Right" Margin="0,6,10,0" />
+                <Slider Grid.Row="5" Grid.Column="1" Minimum="-10" Maximum="10" Value="{x:Bind Velocity.y}" />
+
+                <TextBlock Grid.Row="6" Text="Z" FontSize="12" HorizontalAlignment="Right" Margin="0,6,10,0" />
+                <Slider Grid.Row="6" Grid.Column="1" Minimum="-10" Maximum="10" Value="{x:Bind Velocity.z}" />
+
+            </Grid>
         </DataTemplate>
     </Page.Resources>
 
@@ -76,11 +109,8 @@
              viewport where the 3D scene will be rendered to. -->
         <Grid x:Name="ViewportGrid" Grid.Row="1" Grid.RowSpan="2" SizeChanged="ViewportGrid_SizeChanged"  />
 
-        <Button x:Name="myButton" Grid.Row="1" Click="ClickHandler">Click Me</Button>
 
-        
-        
-        
+
         <!-- Right Side Grid -->
         <Grid x:Name="RightSideGrid" Grid.Row="1" Grid.Column="2">
             <Grid.ColumnDefinitions>
