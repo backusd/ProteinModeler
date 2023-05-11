@@ -217,7 +217,44 @@ namespace winrt::ProteinModeler::implementation
             lvi.ContentTemplate(collapsed);
         }
     }
-}
 
+
+
+    void MainPage::NavigationTabsAddSelectView_ItemInvoked(winrt::Microsoft::UI::Xaml::Controls::NavigationView const& sender, winrt::Microsoft::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs const& args)
+    {
+        if (args.InvokedItemContainer())
+        {
+            winrt::hstring value = winrt::unbox_value_or<winrt::hstring>(args.InvokedItemContainer().Tag(), L"");
+
+            if (value == L"Add")
+            {
+                if (NavigationGridAdd().Visibility() != Visibility::Visible)
+                {
+                    NavigationGridAdd().Visibility(Visibility::Visible);
+                    NavigationGridSelect().Visibility(Visibility::Collapsed);
+                    NavigationGridView().Visibility(Visibility::Collapsed);
+                }
+            }
+            else if (value == L"Select")
+            {
+                if (NavigationGridSelect().Visibility() != Visibility::Visible)
+                {
+                    NavigationGridAdd().Visibility(Visibility::Collapsed);
+                    NavigationGridSelect().Visibility(Visibility::Visible);
+                    NavigationGridView().Visibility(Visibility::Collapsed);
+                }
+            }
+            else if (value == L"View")
+            {
+                if (NavigationGridView().Visibility() != Visibility::Visible)
+                {
+                    NavigationGridAdd().Visibility(Visibility::Collapsed);
+                    NavigationGridSelect().Visibility(Visibility::Collapsed);
+                    NavigationGridView().Visibility(Visibility::Visible);
+                }
+            }
+        }
+    }
+}
 
 

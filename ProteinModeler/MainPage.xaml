@@ -125,13 +125,33 @@
             <!--- Grid to hold all information about atoms/molecules in the simulation-->
             <Grid x:Name="SimulationContentsGrid" Grid.Row="0" Background="{StaticResource PanelBackground}" Margin="3" CornerRadius="5">
 
+                <muxc:NavigationView x:Name="NavigationTabsAddSelectView" PaneDisplayMode="Top" SelectionFollowsFocus="Enabled" IsBackButtonVisible="Collapsed" IsSettingsVisible="False" ItemInvoked="NavigationTabsAddSelectView_ItemInvoked"> 
+                    <muxc:NavigationView.MenuItems>
+                        <muxc:NavigationViewItem Content="Add" Tag="Add" x:Name="NavigationTabAdd" FontSize="14" />
+                        <muxc:NavigationViewItem Content="Select" Tag="Select" x:Name="NavigationTabSelect" FontSize="14" />
+                        <muxc:NavigationViewItem Content="View" Tag="View" x:Name="NavigationTabView" FontSize="14" />
+                    </muxc:NavigationView.MenuItems>
+                    <Grid>
+                        <Grid x:Name="NavigationGridAdd" Visibility="Visible" Background="Red">
+                        
+                        </Grid>
+                        <Grid x:Name="NavigationGridSelect" Visibility="Collapsed" Background="Green">
+
+                        </Grid>
+                        <Grid x:Name="NavigationGridView" Visibility="Collapsed" Background="Blue">
+
+                        </Grid>
+                    </Grid>
+                </muxc:NavigationView>
+
+                <!--
                 <ListView x:Name="AtomsListView" 
                           ItemsSource="{x:Bind AtomsViewModel.Atoms}" 
                           ItemTemplate="{StaticResource AtomListViewItemCollapsed}" 
                           SelectionChanged="AtomsListView_SelectionChanged" 
                           ItemClick="AtomsListView_ItemClick" 
                           IsItemClickEnabled="True" />               
-
+                -->
             </Grid>
 
             <!-- Grid to hold the settings for the scene/simulation -->
