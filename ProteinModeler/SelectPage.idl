@@ -1,0 +1,8 @@
+namespace ProteinModeler
+{
+    [default_interface]
+    runtimeclass SelectPage : Windows.UI.Xaml.Controls.Page
+    {
+        SelectPage();
+    }
+}

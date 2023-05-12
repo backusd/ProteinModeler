@@ -108,6 +108,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AddPage.h">
+      <DependentUpon>AddPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
     <ClInclude Include="Atom.h" />
     <ClInclude Include="AtomViewModel.h" />
     <ClInclude Include="BlendState.h" />
@@ -133,16 +137,33 @@
     <ClInclude Include="RasterizerState.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderObjectList.h" />
+    <ClInclude Include="SelectPage.h">
+      <DependentUpon>SelectPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
     <ClInclude Include="Shaders.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="ViewPage.h">
+      <DependentUpon>ViewPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="AddPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SelectPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ViewPage.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
@@ -161,6 +182,10 @@
     <Image Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AddPage.cpp">
+      <DependentUpon>AddPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
     <ClCompile Include="Atom.cpp" />
     <ClCompile Include="AtomViewModel.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -179,9 +204,21 @@
     </ClCompile>
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="SelectPage.cpp">
+      <DependentUpon>SelectPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
     <ClCompile Include="Simulation.cpp" />
+    <ClCompile Include="ViewPage.cpp">
+      <DependentUpon>ViewPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Midl Include="AddPage.idl">
+      <DependentUpon>AddPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Midl>
     <Midl Include="App.idl">
       <DependentUpon>App.xaml</DependentUpon>
     </Midl>
@@ -190,6 +227,14 @@
     <Midl Include="ElementTypeFormatter.idl" />
     <Midl Include="MainPage.idl">
       <DependentUpon>MainPage.xaml</DependentUpon>
+    </Midl>
+    <Midl Include="SelectPage.idl">
+      <DependentUpon>SelectPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Midl>
+    <Midl Include="ViewPage.idl">
+      <DependentUpon>ViewPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
     </Midl>
   </ItemGroup>
   <ItemGroup>

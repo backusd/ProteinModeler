@@ -1,0 +1,8 @@
+namespace ProteinModeler
+{
+    [default_interface]
+    runtimeclass AddPage : Windows.UI.Xaml.Controls.Page
+    {
+        AddPage();
+    }
+}

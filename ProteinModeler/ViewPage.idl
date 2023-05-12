@@ -1,0 +1,8 @@
+namespace ProteinModeler
+{
+    [default_interface]
+    runtimeclass ViewPage : Windows.UI.Xaml.Controls.Page
+    {
+        ViewPage();
+    }
+}

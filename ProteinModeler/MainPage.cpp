@@ -220,41 +220,73 @@ namespace winrt::ProteinModeler::implementation
 
 
 
+
+    void MainPage::AddSelectViewContentFrame_NavigationFailed(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Navigation::NavigationFailedEventArgs const& e)
+    {
+        throw winrt::hresult_error(E_FAIL, winrt::hstring(L"Failed to load Page ") + e.SourcePageType().Name);
+    }
+    void MainPage::NavigationTabsAddSelectView_Loaded(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::RoutedEventArgs const& e)
+    {
+        // NavigationView doesn't load any page by default, so load Add page.
+        // This requires 2 steps: 1) Select the first Tab, and 2) Load the content frame to the Add page
+        NavigationTabsAddSelectView().SelectedItem(NavigationTabsAddSelectView().MenuItems().GetAt(0));
+        AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), nullptr);
+    }
+    void MainPage::NavigationTabsAddSelectView_SelectionChanged(winrt::Microsoft::UI::Xaml::Controls::NavigationView const& sender, winrt::Microsoft::UI::Xaml::Controls::NavigationViewSelectionChangedEventArgs const& args)
+    {
+        if (args.SelectedItemContainer()) 
+        {
+            hstring tag = unbox_value<hstring>(args.SelectedItemContainer().Tag()); 
+
+            Windows::UI::Xaml::Interop::TypeName previousPage = AddSelectViewContentFrame().CurrentSourcePageType();
+
+            if (tag == L"AddPage")
+            {
+                if (previousPage.Name != L"ProteinModeler.AddPage")
+                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), nullptr);
+            }
+            else if (tag == L"SelectPage")
+            {
+                if (previousPage.Name != L"ProteinModeler.SelectPage")
+                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::SelectPage>(), nullptr);
+            }
+            else if (tag == L"ViewPage")
+            {
+                if (previousPage.Name != L"ProteinModeler.ViewPage")
+                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::ViewPage>(), nullptr);
+            }
+        }
+    }
     void MainPage::NavigationTabsAddSelectView_ItemInvoked(winrt::Microsoft::UI::Xaml::Controls::NavigationView const& sender, winrt::Microsoft::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs const& args)
     {
         if (args.InvokedItemContainer())
         {
-            winrt::hstring value = winrt::unbox_value_or<winrt::hstring>(args.InvokedItemContainer().Tag(), L"");
+            hstring tag = winrt::unbox_value<hstring>(args.InvokedItemContainer().Tag());
 
-            if (value == L"Add")
+            Windows::UI::Xaml::Interop::TypeName previousPage = AddSelectViewContentFrame().CurrentSourcePageType(); 
+
+            if (tag == L"AddPage")
             {
-                if (NavigationGridAdd().Visibility() != Visibility::Visible)
-                {
-                    NavigationGridAdd().Visibility(Visibility::Visible);
-                    NavigationGridSelect().Visibility(Visibility::Collapsed);
-                    NavigationGridView().Visibility(Visibility::Collapsed);
-                }
+                if (previousPage.Name != L"ProteinModeler.AddPage")
+                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), nullptr);
             }
-            else if (value == L"Select")
+            else if (tag == L"SelectPage")
             {
-                if (NavigationGridSelect().Visibility() != Visibility::Visible)
-                {
-                    NavigationGridAdd().Visibility(Visibility::Collapsed);
-                    NavigationGridSelect().Visibility(Visibility::Visible);
-                    NavigationGridView().Visibility(Visibility::Collapsed);
-                }
+                if (previousPage.Name != L"ProteinModeler.SelectPage")
+                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::SelectPage>(), nullptr);
             }
-            else if (value == L"View")
+            else if (tag == L"ViewPage")
             {
-                if (NavigationGridView().Visibility() != Visibility::Visible)
-                {
-                    NavigationGridAdd().Visibility(Visibility::Collapsed);
-                    NavigationGridSelect().Visibility(Visibility::Collapsed);
-                    NavigationGridView().Visibility(Visibility::Visible);
-                }
+                if (previousPage.Name != L"ProteinModeler.ViewPage")
+                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::ViewPage>(), nullptr);
             }
         }
     }
+   
 }
+
+
+
+
 
 
