@@ -18,9 +18,8 @@ namespace winrt::ProteinModeler::implementation
     void AddPage::ModelerMainPtr(int64_t value)
     {
         m_modelerMain = reinterpret_cast<ModelerMain*>(value);
+        WINRT_ASSERT(m_modelerMain != nullptr);
     }
-
-
     void AddPage::OnNavigatedTo(NavigationEventArgs const& e)
     {
         // Unbox the parameter (and cast to ModelerMain*)
@@ -51,12 +50,12 @@ namespace winrt::ProteinModeler::implementation
             else if (tag == L"AddMolecule")
             {
                 if (previousPage.Name != L"ProteinModeler.AddMoleculePage")
-                    AddContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddMoleculePage>(), nullptr);
+                    AddContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddMoleculePage>(), winrt::box_value<int64_t>(reinterpret_cast<int64_t>(m_modelerMain)));
             }
             else if (tag == L"AddProtein")
             {
                 if (previousPage.Name != L"ProteinModeler.AddProteinPage")
-                    AddContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddProteinPage>(), nullptr);
+                    AddContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddProteinPage>(), winrt::box_value<int64_t>(reinterpret_cast<int64_t>(m_modelerMain)));
             }
         }
 	}

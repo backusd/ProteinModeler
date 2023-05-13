@@ -4,5 +4,6 @@ namespace ProteinModeler
     runtimeclass SelectPage : Windows.UI.Xaml.Controls.Page
     {
         SelectPage();
+        Int64 ModelerMainPtr;
     }
 }

@@ -9,7 +9,7 @@
     mc:Ignorable="d">
     <Page.Resources>
         <local:ElementTypeFormatter x:Key="DefaultElementTypeFormatter"/>
-        <SolidColorBrush x:Key="PanelBackground" Color="#333" />
+        <SolidColorBrush x:Key="PanelBackground" Color="#111" />
 
         <DataTemplate x:Name="AtomListViewItemCollapsed" x:Key="AtomListViewItemCollapsed" x:DataType="local:Atom">
             <TextBlock Text="{x:Bind Type, Converter={StaticResource DefaultElementTypeFormatter}}" />
@@ -129,15 +129,17 @@
                                      PaneDisplayMode="Top" 
                                      SelectionFollowsFocus="Enabled" 
                                      IsBackButtonVisible="Collapsed" 
+                                     IsBackEnabled="False"
                                      IsSettingsVisible="False" 
                                      ItemInvoked="NavigationTabsAddSelectView_ItemInvoked"
-                                     Loaded="NavigationTabsAddSelectView_Loaded"> 
+                                     Loaded="NavigationTabsAddSelectView_Loaded" 
+                                     Margin="0,0,-12,-24">
                     <muxc:NavigationView.MenuItems>
                         <muxc:NavigationViewItem Content="Add" Tag="AddPage" x:Name="NavigationTabAdd" FontSize="14" />
                         <muxc:NavigationViewItem Content="Select" Tag="SelectPage" x:Name="NavigationTabSelect" FontSize="14" />
                         <muxc:NavigationViewItem Content="View" Tag="ViewPage" x:Name="NavigationTabView" FontSize="14" />
                     </muxc:NavigationView.MenuItems>
-                    <ScrollViewer>
+                    <ScrollViewer Background="{StaticResource PanelBackground}">
                         <Frame x:Name="AddSelectViewContentFrame" Padding="12,0,12,24" IsTabStop="True" NavigationFailed="AddSelectViewContentFrame_NavigationFailed"/>
                     </ScrollViewer>
                 </muxc:NavigationView>

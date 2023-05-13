@@ -219,11 +219,7 @@ namespace winrt::ProteinModeler::implementation
         // NavigationView doesn't load any page by default, so load Add page.
         // This requires 2 steps: 1) Select the first Tab, and 2) Load the content frame to the Add page
         NavigationTabsAddSelectView().SelectedItem(NavigationTabsAddSelectView().MenuItems().GetAt(0));
-        
         AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), winrt::box_value<int64_t>(reinterpret_cast<int64_t>(m_main.get())));
-
-        
-        //AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), winrt::box_value<winrt::ProteinModeler::AtomViewModel>(m_atomsViewModel));
     }
     void MainPage::NavigationTabsAddSelectView_ItemInvoked(winrt::Microsoft::UI::Xaml::Controls::NavigationView const& sender, winrt::Microsoft::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs const& args)
     {
@@ -237,19 +233,16 @@ namespace winrt::ProteinModeler::implementation
             {
                 if (previousPage.Name != L"ProteinModeler.AddPage")
                     AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), winrt::box_value<int64_t>(reinterpret_cast<int64_t>(m_main.get())));
-
-                    //AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), winrt::box_value<winrt::ProteinModeler::AtomViewModel>(m_atomsViewModel));
-                    //AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), nullptr);
             }
             else if (tag == L"SelectPage")
             {
                 if (previousPage.Name != L"ProteinModeler.SelectPage")
-                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::SelectPage>(), nullptr);
+                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::SelectPage>(), winrt::box_value<int64_t>(reinterpret_cast<int64_t>(m_main.get())));
             }
             else if (tag == L"ViewPage")
             {
                 if (previousPage.Name != L"ProteinModeler.ViewPage")
-                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::ViewPage>(), nullptr);
+                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::ViewPage>(), winrt::box_value<int64_t>(reinterpret_cast<int64_t>(m_main.get())));
             }
         }
     }

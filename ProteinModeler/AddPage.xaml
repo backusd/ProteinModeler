@@ -15,9 +15,21 @@
                          Loaded="NavigationAdd_Loaded"
                          ItemInvoked="NavigationAdd_ItemInvoked">
         <muxc:NavigationView.MenuItems>
-            <muxc:NavigationViewItem Icon="Play" Content="Atom" Tag="AddAtom" />
-            <muxc:NavigationViewItem Icon="Save" Content="Molecule" Tag="AddMolecule" />
-            <muxc:NavigationViewItem Icon="Refresh" Content="Protein" Tag="AddProtein" />
+            <muxc:NavigationViewItem Content="Atom" Tag="AddAtom">
+                <muxc:NavigationViewItem.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7C8;" Foreground="BlueViolet" />
+                </muxc:NavigationViewItem.Icon>
+            </muxc:NavigationViewItem>
+            <muxc:NavigationViewItem Content="Molecule" Tag="AddMolecule">
+                <muxc:NavigationViewItem.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC26;" Foreground="Green"/>
+                </muxc:NavigationViewItem.Icon>
+            </muxc:NavigationViewItem>
+            <muxc:NavigationViewItem Content="Protein" Tag="AddProtein" >
+                <muxc:NavigationViewItem.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE95F;" Foreground="IndianRed" />
+                </muxc:NavigationViewItem.Icon>
+            </muxc:NavigationViewItem>
         </muxc:NavigationView.MenuItems>
         <Frame x:Name="AddContentFrame"/>
     </muxc:NavigationView>

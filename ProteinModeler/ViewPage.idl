@@ -4,5 +4,6 @@ namespace ProteinModeler
     runtimeclass ViewPage : Windows.UI.Xaml.Controls.Page
     {
         ViewPage();
+        Int64 ModelerMainPtr;
     }
 }

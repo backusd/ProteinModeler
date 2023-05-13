@@ -4,13 +4,27 @@
     <ApplicationDefinition Include="App.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="MainPage.xaml" />
-    <Page Include="AddPage.xaml" />
-    <Page Include="SelectPage.xaml" />
-    <Page Include="ViewPage.xaml" />
-    <Page Include="AddAtomPage.xaml" />
-    <Page Include="AddMoleculePage.xaml" />
-    <Page Include="AddProteinPage.xaml" />
+    <Page Include="AddAtomPage.xaml">
+      <Filter>Pages</Filter>
+    </Page>
+    <Page Include="AddMoleculePage.xaml">
+      <Filter>Pages</Filter>
+    </Page>
+    <Page Include="AddPage.xaml">
+      <Filter>Pages</Filter>
+    </Page>
+    <Page Include="AddProteinPage.xaml">
+      <Filter>Pages</Filter>
+    </Page>
+    <Page Include="SelectPage.xaml">
+      <Filter>Pages</Filter>
+    </Page>
+    <Page Include="ViewPage.xaml">
+      <Filter>Pages</Filter>
+    </Page>
+    <Page Include="MainPage.xaml">
+      <Filter>Pages</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -141,6 +155,9 @@
     </Filter>
     <Filter Include="Utils">
       <UniqueIdentifier>{387280b8-ee02-47a1-95b0-7eea00e76ee4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pages">
+      <UniqueIdentifier>{bb488dac-4b0d-4477-b218-af4ef2c00158}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

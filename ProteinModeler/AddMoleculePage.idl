@@ -4,5 +4,6 @@ namespace ProteinModeler
     runtimeclass AddMoleculePage : Windows.UI.Xaml.Controls.Page
     {
         AddMoleculePage();
+        Int64 ModelerMainPtr;
     }
 }
