@@ -8,6 +8,9 @@
     <Page Include="AddPage.xaml" />
     <Page Include="SelectPage.xaml" />
     <Page Include="ViewPage.xaml" />
+    <Page Include="AddAtomPage.xaml" />
+    <Page Include="AddMoleculePage.xaml" />
+    <Page Include="AddProteinPage.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -15,6 +18,7 @@
     <Midl Include="Atom.idl" />
     <Midl Include="AtomViewModel.idl" />
     <Midl Include="ElementTypeFormatter.idl" />
+    <Midl Include="NavigationData.idl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -38,6 +42,7 @@
     <ClCompile Include="Atom.cpp" />
     <ClCompile Include="AtomViewModel.cpp" />
     <ClCompile Include="ElementTypeFormatter.cpp" />
+    <ClCompile Include="NavigationData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -93,6 +98,7 @@
     <ClInclude Include="Atom.h" />
     <ClInclude Include="AtomViewModel.h" />
     <ClInclude Include="ElementTypeFormatter.h" />
+    <ClInclude Include="NavigationData.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">

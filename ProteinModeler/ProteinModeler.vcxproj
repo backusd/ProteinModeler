@@ -108,8 +108,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AddAtomPage.h">
+      <DependentUpon>AddAtomPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
+    <ClInclude Include="AddMoleculePage.h">
+      <DependentUpon>AddMoleculePage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
     <ClInclude Include="AddPage.h">
       <DependentUpon>AddPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
+    <ClInclude Include="AddProteinPage.h">
+      <DependentUpon>AddProteinPage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClInclude>
     <ClInclude Include="Atom.h" />
@@ -126,6 +138,7 @@
     <ClInclude Include="MeshSet.h" />
     <ClInclude Include="ModelerMain.h" />
     <ClInclude Include="ModelerUIControl.h" />
+    <ClInclude Include="NavigationData.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="App.h">
       <DependentUpon>App.xaml</DependentUpon>
@@ -154,7 +167,16 @@
     <ApplicationDefinition Include="App.xaml">
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="AddAtomPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AddMoleculePage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="AddPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AddProteinPage.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="MainPage.xaml">
@@ -182,8 +204,20 @@
     <Image Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AddAtomPage.cpp">
+      <DependentUpon>AddAtomPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
+    <ClCompile Include="AddMoleculePage.cpp">
+      <DependentUpon>AddMoleculePage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
     <ClCompile Include="AddPage.cpp">
       <DependentUpon>AddPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
+    <ClCompile Include="AddProteinPage.cpp">
+      <DependentUpon>AddProteinPage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClCompile>
     <ClCompile Include="Atom.cpp" />
@@ -193,6 +227,7 @@
     <ClCompile Include="ElementTypeFormatter.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="ModelerMain.cpp" />
+    <ClCompile Include="NavigationData.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -215,8 +250,20 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Midl Include="AddAtomPage.idl">
+      <DependentUpon>AddAtomPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Midl>
+    <Midl Include="AddMoleculePage.idl">
+      <DependentUpon>AddMoleculePage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Midl>
     <Midl Include="AddPage.idl">
       <DependentUpon>AddPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Midl>
+    <Midl Include="AddProteinPage.idl">
+      <DependentUpon>AddProteinPage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Midl>
     <Midl Include="App.idl">
@@ -228,6 +275,7 @@
     <Midl Include="MainPage.idl">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Midl>
+    <Midl Include="NavigationData.idl" />
     <Midl Include="SelectPage.idl">
       <DependentUpon>SelectPage.xaml</DependentUpon>
       <SubType>Code</SubType>

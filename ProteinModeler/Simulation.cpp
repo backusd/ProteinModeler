@@ -8,11 +8,14 @@ Simulation::Simulation() noexcept :
 	m_boxMax(3.0f)
 {}
 
-void Simulation::Add(Element element, const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& velocity) noexcept
+size_t Simulation::Add(Element element, const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& velocity) noexcept
 {
 	m_elementTypes.push_back(element);
 	m_positions.push_back(position);
 	m_velocities.push_back(velocity);
+
+	// return the index of the most recent atom
+	return m_elementTypes.size() - 1;
 }
 
 void Simulation::Update(const Timer& timer)

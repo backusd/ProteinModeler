@@ -31,6 +31,13 @@ public:
     // Rendering Stuff
     inline void SetViewport(float top, float left, float height, float width) const { m_renderer->SetViewport(top, left, height, width); }
 
+    // Modification Methods
+    void AddAtom(Element element, const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& velocity) noexcept 
+    { 
+        size_t index = m_simulation->Add(element, position, velocity); 
+        m_renderer->AddInstance(element, &m_simulation->Positions()[index]);
+    }
+
 private:
     void UpdateLayoutState();
 

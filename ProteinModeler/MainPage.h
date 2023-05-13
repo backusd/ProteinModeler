@@ -52,12 +52,9 @@ namespace winrt::ProteinModeler::implementation
 
 
 
-        int32_t MyProperty();
-        void MyProperty(int32_t value);
-
     private:
         std::shared_ptr<DeviceResources>    m_deviceResources;
-        std::unique_ptr<ModelerMain>        m_main;
+        std::shared_ptr<ModelerMain>        m_main;
 
         bool m_windowVisible;
 
@@ -82,7 +79,6 @@ namespace winrt::ProteinModeler::implementation
         // Top-Right Panel
         void AddSelectViewContentFrame_NavigationFailed(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Navigation::NavigationFailedEventArgs const& e);
         void NavigationTabsAddSelectView_Loaded(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::RoutedEventArgs const& e);
-        void NavigationTabsAddSelectView_SelectionChanged(winrt::Microsoft::UI::Xaml::Controls::NavigationView const& sender, winrt::Microsoft::UI::Xaml::Controls::NavigationViewSelectionChangedEventArgs const& args);
         void NavigationTabsAddSelectView_ItemInvoked(winrt::Microsoft::UI::Xaml::Controls::NavigationView const& sender, winrt::Microsoft::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs const& args);
     };
 }

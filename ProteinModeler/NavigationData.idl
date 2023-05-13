@@ -1,0 +1,8 @@
+namespace ProteinModeler
+{
+    runtimeclass NavigationData
+    {
+        NavigationData();
+        void DummyMethod();
+    }
+}

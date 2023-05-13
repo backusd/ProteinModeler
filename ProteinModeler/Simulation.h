@@ -42,7 +42,7 @@ public:
 	void Play() noexcept { m_isPaused = false; }
 	void Pause() noexcept { m_isPaused = true; }
 
-	void Add(Element element, const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& velocity) noexcept;
+	size_t Add(Element element, const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& velocity) noexcept;
 
 	void Update(const Timer& timer);
 

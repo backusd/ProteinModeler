@@ -41,7 +41,7 @@ namespace winrt::ProteinModeler::implementation
 
         m_deviceResources = std::make_shared<DeviceResources>();
 
-        m_main = std::make_unique<ModelerMain>(m_deviceResources, this);
+        m_main = std::make_shared<ModelerMain>(m_deviceResources, this);
     }
     void MainPage::InitializeComponent()
     {
@@ -158,17 +158,6 @@ namespace winrt::ProteinModeler::implementation
 
 
 
-    int32_t MainPage::MyProperty()
-    {
-        throw hresult_not_implemented();
-    }
-
-    void MainPage::MyProperty(int32_t /* value */)
-    {
-        throw hresult_not_implemented();
-    }
-
-
 
 
 
@@ -230,32 +219,11 @@ namespace winrt::ProteinModeler::implementation
         // NavigationView doesn't load any page by default, so load Add page.
         // This requires 2 steps: 1) Select the first Tab, and 2) Load the content frame to the Add page
         NavigationTabsAddSelectView().SelectedItem(NavigationTabsAddSelectView().MenuItems().GetAt(0));
-        AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), nullptr);
-    }
-    void MainPage::NavigationTabsAddSelectView_SelectionChanged(winrt::Microsoft::UI::Xaml::Controls::NavigationView const& sender, winrt::Microsoft::UI::Xaml::Controls::NavigationViewSelectionChangedEventArgs const& args)
-    {
-        if (args.SelectedItemContainer()) 
-        {
-            hstring tag = unbox_value<hstring>(args.SelectedItemContainer().Tag()); 
+        
+        AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), winrt::box_value<int64_t>(reinterpret_cast<int64_t>(m_main.get())));
 
-            Windows::UI::Xaml::Interop::TypeName previousPage = AddSelectViewContentFrame().CurrentSourcePageType();
-
-            if (tag == L"AddPage")
-            {
-                if (previousPage.Name != L"ProteinModeler.AddPage")
-                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), nullptr);
-            }
-            else if (tag == L"SelectPage")
-            {
-                if (previousPage.Name != L"ProteinModeler.SelectPage")
-                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::SelectPage>(), nullptr);
-            }
-            else if (tag == L"ViewPage")
-            {
-                if (previousPage.Name != L"ProteinModeler.ViewPage")
-                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::ViewPage>(), nullptr);
-            }
-        }
+        
+        //AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), winrt::box_value<winrt::ProteinModeler::AtomViewModel>(m_atomsViewModel));
     }
     void MainPage::NavigationTabsAddSelectView_ItemInvoked(winrt::Microsoft::UI::Xaml::Controls::NavigationView const& sender, winrt::Microsoft::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs const& args)
     {
@@ -268,7 +236,10 @@ namespace winrt::ProteinModeler::implementation
             if (tag == L"AddPage")
             {
                 if (previousPage.Name != L"ProteinModeler.AddPage")
-                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), nullptr);
+                    AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), winrt::box_value<int64_t>(reinterpret_cast<int64_t>(m_main.get())));
+
+                    //AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), winrt::box_value<winrt::ProteinModeler::AtomViewModel>(m_atomsViewModel));
+                    //AddSelectViewContentFrame().Navigate(winrt::xaml_typename<ProteinModeler::AddPage>(), nullptr);
             }
             else if (tag == L"SelectPage")
             {

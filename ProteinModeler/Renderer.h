@@ -38,6 +38,12 @@ public:
 
 	void SetViewport(float top, float left, float height, float width) noexcept;
 
+	void AddInstance(Element element, DirectX::XMFLOAT3* position)
+	{
+		float r = AtomicRadii[static_cast<int>(element)];
+		static_cast<RenderObjectInstanced<unsigned int>*>(std::get<1>(std::get<1>(m_configsAndObjectLists[0])[0])[0].get())->AddInstance({ r, r, r }, position, static_cast<int>(element) - 1);
+	}
+
 
 private:
 	void CreateMainPipelineConfig();
